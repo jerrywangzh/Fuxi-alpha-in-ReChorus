@@ -1,13 +1,13 @@
 # FuXi-α 编码块从输入到预测的完整数据流
 
-本文说明 FuXi-α 模型中 **一个 FuXi Block** （AMS + MFFN） 从输入向量到输出预测的完整流程，并给出每一步张量形状、线性 / 非线性运算公式。
+本文说明 FuXi-α 模型中 一个 **FuXi Block** （AMS + MFFN） 从输入向量到输出预测的完整流程，并给出每一步张量形状、线性 和 非线性运算公式。
 
-全流程拆成两大部分：
+具体拆成两大部分：
 
 * **AMS（Adaptive Multi-channel Self-attention，多通道自注意力）**
 * **MFFN（Multi-Stage Feed-Forward Network，多阶段前馈网络）**
 
-> 输入序列通过一个fuxiblock，可以视作一下过程
+> 输入序列通过一个fuxiblock，可以视作以下过程
 > 输入序列表示 `x` ──> AMS（多通道注意力）──> MFFN（两阶段前馈）──> 新的序列表示 `x'`
 > 多个 FuXi Block 堆叠，再接一个 MLP / 点积层，就是最终的推荐预测。
 
@@ -17,14 +17,14 @@
 
 假设：
 
-* `B`：batch size（一次喂入的用户序列条数）
-* `N`：每个用户序列在当前 batch 中的最大长度（padding 到统一长度）
-* `D`：embedding 维度（`embedding_dim`）
-* `H`：多头注意力的 head 数（`num_heads`）
-* `D_attn`：注意力中每个 head 的 q/k 维度（`attention_dim`）
-* `D_lin`：每个 head 的 v 维度（`linear_dim`）
+* `B`：batch size（一个 batch 的用户序列条数）
+* `N`：每个用户序列在当前 batch 中的最大长度（序列长度不足空位补0，即 `padded` 形式）
+* `D`：embedding 维度（用户序列经reader处理后，item_id 映射为长度为 embedding 的向量，（`--embedding_dim`）
+* `H`：AMS 中 注意力头的 head 个数（`--num_heads`）
+* `D_attn`：AMS 中每个 head 的 q/k 维度（`--attention_dim`）
+* `D_lin`：每个 head 的输出维度，`3 * H * D_lin` 是输入 MFFN 的向量维度（`--linear_dim`）
 
-典型形状：
+一般形状：
 
 * 交互序列输入（从 embedding 层来）
   `x` : `(B, N, D)`
@@ -32,14 +32,16 @@
 * 时间戳：
   `timestamps` : `(B, N)`
 
-在 FuXi 中，为了效率，经常用 **Jagged Tensor**（不等长拼接）形式：
+在 FuXi 中，为了效率，经常用 **Jagged Tensor**（不等长拼接）形式处理，用 **x_offsets** 记录位置：
 
-* `x` 也可以被展平成
+* 为了方便计算，`x` 被展平成
   `x_flat` : `(sum_i N_i, D)`
   其中 `sum_i N_i` 是当前 batch 中所有序列长度之和。
-* `x_offsets` : `(B + 1,)`，记录每个序列在 `x_flat` 里的起止位置。
+* `x_offsets` : `(B + 1,)`，记录每个序列在 `x_flat` 里的起止位置，`x[i+1] - x[i]` 即当前序列长度
 
-下面讲 AMS 和 MFFN 时，会交替用 `(B, N, ·)`（dense）与 `(sum_i N_i, ·)`（jagged）两种视角。
+# Fuxi 的时间复杂度主要集中在 AMS ,尤其是 语义块 的计算中，其中涉及多次矩阵乘法。对于语义块，一个 batch 会耗时 o(B * N * N * H * D_attn) + o(B * N * N * H * D_lin) ~ o(2 * B * N^2 * H * max{D_attn,D_lin}) 。
+# 因此 Fuxi 使用 fbgemm_gpu 高效算子进行运算。会将序列规定长度 N 在计算中换成实际长度 N_i ，稀疏化计算 + 自带功能优化 使得复杂时间任务能高效完成。这也是 Fuxi 堆叠 fuxiblock 形成深层网络 和 训练工业数据集（亿级点击量）的基础
+# 下面解释 AMS 和 MFFN 时，会交替用 `(B, N, ·)`（dense）与 `(sum_i N_i, ·)` 也可写作 `(sumN, ·)` （jagged）两种视角。
 
 ---
 
@@ -52,12 +54,12 @@ AMS 模块所在的 `FuXiBlockJagged.forward` 签名：
 ```python
 def forward(
     self,
-    x: Tensor,              # (sum_i N_i, D)
-    x_offsets: Tensor,      # (B + 1,)
-    all_timestamps: Tensor, # (B, N)   时间戳
-    invalid_attn_mask: Tensor,  # (B, N, N)   合法位置 = 1, 非法位置(未来/填充) = 0
+    x: Tensor,                     # (sum_i N_i, D)
+    x_offsets: Tensor,            # (B + 1,)
+    all_timestamps: Tensor,      # (B, N)   时间戳
+    invalid_attn_mask: Tensor,  # (B, N, N)   合法位置 = 1, 非法位置(未来/填充) = 0 ，一般为下三角矩阵
     ...
-) -> new_outputs: Tensor    # (sum_i N_i, D)
+) -> new_outputs: Tensor      # (sum_i N_i, D)
 ```
 
 在进入 AMS 计算前，`x` 会先做 RMSNorm 和一个大矩阵投影 `_uvqk`。
@@ -68,18 +70,17 @@ def forward(
 
 ```python
 normed_x = F.rms_norm(x, normalized_shape=[D], eps=eps)
-# 形状不变： (sum_i N_i, D)
 ```
 
 每一行向量 `x_i` 做 **RMSNorm**，公式：
 
 ```text
-r_i = sqrt( mean_j( x_i[j]^2 ) + eps )
-normed_x_i[j] = x_i[j] / r_i
+r_i = sqrt(mean_j( x_i[j]^2 ) + eps)  # eps 由 --epsilon 控制，是定义的误差偏移
+normed_x_i[j] = x_i[j] / r_i  # 缩放，防止爆炸
 ```
 
-* 这里 `i` 走的是所有 token（总共 `sum_i N_i` 个），每个 token 向量长度是 `D`。
-* RMSNorm 是对每个 token 自己的一维向量做归一化，不会跨样本、跨时间混。
+* 这里 `i` 走的是所有 token（总共 `sum_i N_i` 个），每个 token 的长度是 `D`。
+* RMSNorm 是对每个 token 自己的一维向量做归一化。
 
 ---
 
@@ -87,12 +88,12 @@ normed_x_i[j] = x_i[j] / r_i
 
 ```python
 batched_mm_output = torch.mm(normed_x, self._uvqk)
-# normed_x:       (sumN, D)
-# _uvqk(weight):  (D, 4 * H * D_lin + 2 * H * D_attn)
-# batched_mm_output: (sumN, 4*H*D_lin + 2*H*D_attn)
+# normed_x:       (sum_i N_i, D)
+# _uvqk(参数矩阵):  (D, 4*H*D_lin + 2*H*D_attn)
+# batched_mm_output: (sum_i N_i, 4*H*D_lin + 2*H*D_attn)
 ```
 
-* 这里 `_uvqk` 是**一个共享的线性变换矩阵**，同时产生：
+* 这里 `_uvqk` 是**一个共享矩阵**，同时产生：
 
   * u：AMS 内的门控向量（后面与注意力输出逐点相乘）
   * v：值向量 value
@@ -106,7 +107,7 @@ if self._linear_activation == "silu":
     batched_mm_output = F.silu(batched_mm_output)
 ```
 
-SiLU 逐元素作用：
+SiLU 逐元素进行：
 
 ```text
 silu(z) = z * sigmoid(z)
@@ -123,29 +124,13 @@ u, v, q, k = torch.split(
         1 * H * D_attn,  # q: H * D_attn
         1 * H * D_attn,  # k: H * D_attn
     ],
-    dim=1,
+    dim=1,               # 按 1 维度拆解，0 维度长度是sum_i N_i。
 )
-# u: (sumN, 3*H*D_lin)
-# v: (sumN,   H*D_lin)
-# q: (sumN,   H*D_attn)
-# k: (sumN,   H*D_attn)
-```
 
-**直观理解：**
-
-* 每个 token 的原始 embedding `x_i` 被映射到长向量
-  `[u_i, v_i, q_i, k_i]`
-* 其中：
-
-  * `q_i, k_i` 用于**语义通道**的注意力打分
-  * `v_i` 用于**三个通道**的值
-  * `u_i` 则是对三通道注意力输出的**门控权重**
-
----
 
 ### 1.4 jagged 转 dense：构造 `(B, N, H, D_attn)` 和 `(B, N, H, D_lin)`
 
-注意：`q, k, v` 当前是 `(sumN, ·)`，要变成 batch 结构：
+注意：`q, k, v` 当前是 `(sum_i N_i, ·)`，要变成 batch 结构：
 
 ```python
 # 先从 jagged -> dense，得到 (B, N, H*D_attn)
@@ -165,43 +150,21 @@ padded_v = padded_v.view(B, N, H, D_lin)   # (B, N, H, D_lin)
 
 ### 1.5 语义通道注意力：`qk_attn`
 
-代码（简化后）：
 
 ```python
 qk_attn = torch.einsum(
     "bnhd,bmhd->bhnm",
-    padded_q,  # (B,N,H,D_attn)
-    padded_k,  # (B,N,H,D_attn)
+    padded_q,  # (B, N, H, D_attn)
+    padded_k,  # (B, N, H, D_attn)
 )
-# qk_attn: (B, H, N, N)
+# qk_attn: (B, H, N, N) 自注意力下 n = m
 
-qk_attn = F.silu(qk_attn) / n    # n = N
-qk_attn = qk_attn * invalid_attn_mask.unsqueeze(0).unsqueeze(0)
+qk_attn = F.silu(qk_attn) / n   
+# n = N, 此处和传统QK矩阵不同，不采用softmax计算概率，而采用 silu 后用序列长度 N 进行缩放
+# 论文中指出，此种做法利于收敛
+
+qk_attn = qk_attn * invalid_attn_mask.unsqueeze(0).unsqueeze(0) #(N, N) ------> (1, 1, N, N) ---broadcast---> (B, H, N, N)
 ```
-
-逐步解释：
-
-1. `einsum("bnhd,bmhd->bhnm", q, k)` 计算的是对每个 head 的 `Q * K^T`：
-
-   * 固定 `b`（batch）和 `h`（head），对 `n` 和 `m` 做：
-
-     ```text
-     qk_attn[b, h, n, m] = sum_{d=0..D_attn-1} padded_q[b, n, h, d] * padded_k[b, m, h, d]
-     ```
-   * 得到形状 `(B, H, N, N)`：第一个 N 是 query 位置，第二个 N 是 key 位置。
-
-2. `F.silu(qk_attn) / n`：
-
-   * 用 SiLU 代替 Softmax，作为注意力权重的非线性映射。
-   * `/ n` 是一个缩放因子，防止序列过长时数值过大。
-
-3. `* invalid_attn_mask`：
-
-   * `invalid_attn_mask` 形状 `(B, N, N)`，值为 1 或 0。
-   * `unsqueeze(0).unsqueeze(0)` 之后变为 `(1, 1, B, N, N)`，广播到 `(B, H, N, N)`。
-   * 非法位置（未来、padding）被乘成 0，权重清零。
-
-得到的 `qk_attn` 就是**语义通道**的注意力权重。
 
 ---
 
@@ -212,7 +175,7 @@ qk_attn = qk_attn * invalid_attn_mask.unsqueeze(0).unsqueeze(0)
 ```python
 pos_attn, ts_attn = rel_attn_bias(all_timestamps)
 # pos_attn: (1, N, N)  只依赖位置，相同 batch 共享
-# ts_attn:  (B, N, N)  依赖时间戳（batch 不同）
+# ts_attn:  (B, N, N)  依赖时间戳（不同 batch 不同）
 
 # 掩码
 pos_attn = pos_attn * invalid_attn_mask.unsqueeze(0)  # (1, N, N)
@@ -223,12 +186,12 @@ ts_attn  = ts_attn  * invalid_attn_mask               # (B, N, N)
 
 * 给定时间戳矩阵 `t[b, i]`，构造时间差 `Δt_ij = t[b, j] - t[b, i]`
 * 通过分桶函数 `bucketization_fn(Δt)` 映射到离散桶号 `k`
-* 查表 `ts_w[k]` 得到一个标量，再经过 SiLU 变成时间通道权重 `A_time[i,j]`
+* 查表 `ts_w[k]` 得到一个标量，再经过 silu 变成时间通道权重 `A_time[i,j]`
 * 对位置偏置相似，只是差值是 `Δp = j - i`（相对位置）
 
 从形状上看：
 
-* `pos_attn` 可认为是 `(B, N, N)`，只是本质上 batch 维度是复制的（因为所有序列长度一样时位置结构一样）。
+* `pos_attn` 可认为是 `(B, N, N)`，本质上在 序列 维度是一致的（因为所有序列长度一样时位置结构一样），不复制是由于可以广播。
 * `ts_attn` 每个 batch 都不同，因为时间戳不同。
 
 ---
@@ -242,25 +205,20 @@ ts_attn  = ts_attn  * invalid_attn_mask               # (B, N, N)
 ```python
 output_pos = torch.einsum(
     "bnm,bmhd->bnhd",
-    pos_attn,   # (B,N,N) 广播或复制 pos_attn
-    padded_v,   # (B,N,H,D_lin)
+    pos_attn,   # (B, N, N) 广播
+    padded_v,   # (B, N, H, D_lin)
 )
 # output_pos: (B, N, H, D_lin)
 ```
 
-解释：固定 `b, n, h`，对所有 `m` 求和：
-
-```text
-output_pos[b, n, h, d] = sum_{m=0..N-1} pos_attn[b, n, m] * padded_v[b, m, h, d]
-```
 
 2. **时间通道**：
 
 ```python
 output_ts = torch.einsum(
     "bnm,bmhd->bnhd",
-    ts_attn,    # (B,N,N)
-    padded_v,   # (B,N,H,D_lin)
+    ts_attn,    # (B, N, N)
+    padded_v,   # (B, N, H, D_lin)
 )
 # output_ts: (B, N, H, D_lin)
 ```
@@ -270,8 +228,8 @@ output_ts = torch.einsum(
 ```python
 output_latent = torch.einsum(
     "bhnm,bmhd->bnhd",
-    qk_attn,    # (B,H,N,N)
-    padded_v,   # (B,N,H,D_lin)
+    qk_attn,    # (B, H, N, N)
+    padded_v,   # (B, N, H, D_lin)
 )
 # output_latent: (B, N, H, D_lin)
 ```
@@ -286,7 +244,7 @@ output_latent = torch.einsum(
 
 ```python
 combined_output = torch.concat(
-    [output_pos, output_ts, output_latent],  # 每个都是 (B,N,H,D_lin)
+    [output_pos, output_ts, output_latent],  # 每个都是 (B, N, H, D_lin)
     dim=-1,                                  # 在 D_lin 这个维度拼接
 )
 # combined_output: (B, N, H, 3*D_lin)
@@ -312,7 +270,7 @@ attn_output = dense_to_jagged(
 
 ## 2. MFFN：多阶段前馈网络
 
-MFFN 在代码里对应 `MultistageFeedforwardNeuralNetwork`，在一个 FuXi Block 里被这样调用：
+MFFN 在代码里对应 `MultistageFeedforwardNeuralNetwork`：
 
 ```python
 ams_output = u * self._norm_attn_output(attn_output)
@@ -322,7 +280,7 @@ ams_output = u * self._norm_attn_output(attn_output)
 
 new_outputs = self._mffn(ams_output, x)
 # x:           (sumN, D) 原始输入
-# new_outputs: (sumN, D) 块输出
+# new_outputs: (sumN, D) MFFN 块输出
 ```
 
 下面分 Stage 1 和 Stage 2 详细分析。
@@ -356,12 +314,12 @@ def forward(self, X, X0):
   形状 `(sumN, D)`。
 * `lin0`：形状 `(3*H*D_lin, D)` 的线性层。
 
-逐步：
+逐步进行：
 
-1. Dropout：
+1. Dropout：                  
 
    ```python
-   X_drop = dropout(X)         # (sumN, 3*H*D_lin)
+   X_drop = dropout(X)         # (sumN, 3*H*D_lin)，概率丢弃部分序列，让最终结果更稳定，可设置--fuxi_linear_dropout 控制
    ```
 
 2. 线性映射：
@@ -383,22 +341,17 @@ def forward(self, X, X0):
 h1 = X0 + X_drop @ W1 + b1     # 每个 token 一行
 ```
 
-这里 `h1` 就是 Stage 1 的输出，也就是代码里的 `X`（被覆盖）。
-
-**作用理解：**
-
-* 把来自三通道的 AMS 输出（3 * H * D_lin 维）压缩回主流的 embedding 维 `D`。
-* 同时加上原始输入 `X0` 的残差，保证低阶特征一直保留在信息流中。
+这里 `h1` 就是 Stage 1 的输出。
 
 ---
 
 ### 2.2 Stage 2：RMSNorm + SwiGLU + 第二次残差
 
-当 `single_stage == False` 时，还会执行第二阶段：
+当 `--fuxi_ffn_single_stage 0` 时，还会执行第二阶段：
 
 ```python
 normed_X = F.rms_norm(X, normalized_shape=[D], eps=eps)  # (sumN, D)
-normed_X = F.dropout(normed_X, p=dropout_ratio, training=self.training)
+normed_X = F.dropout(normed_X, p=dropout_ratio, training=self.training) 
 
 X1 = F.silu(self.lin1(normed_X)) * self.lin3(normed_X)
 X  = self.lin2(X1) + X
@@ -430,18 +383,9 @@ X  = self.lin2(X1) + X
    ```python
    a = lin1(normed_X_drop)     # (sumN, hidden_size)
    b = lin3(normed_X_drop)     # (sumN, hidden_size)
-
    gate = silu(a)              # (sumN, hidden_size)
    X1   = gate * b             # 逐元素乘, (sumN, hidden_size)
    ```
-
-   也可以理解为：
-
-   ```text
-   X1 = silu(normed_X_drop @ W3 + b3)  ⊙  (normed_X_drop @ W4 + b4)
-   ```
-
-   其中 `⊙` 表示逐元素乘法。
 
 4. 降回 D 维 + 第二条残差：
 
@@ -453,18 +397,12 @@ X  = self.lin2(X1) + X
 数学上等价于：
 
 ```text
-h2 = h1 + ( silu(h1_norm @ W3 + b3) ⊙ (h1_norm @ W4 + b4) ) @ W5 + b5
+h2 = h1 + (silu(h1_norm @ W3) ⊙ (h1_norm @ W2)) @ W4
 ```
 
 * `h1`：Stage 1 输出
 * `h1_norm`：RMSNorm(h1)
-* `(·) @ W5 + b5` 对应 `lin2`
-
-**直观理解：**
-
-* 先把 Stage 1 输出归一化，再映射到一个更高维的中间空间（`hidden_size`）。
-* 用 SwiGLU 的门控结构让网络可以学习“哪些特征组合应该被放大”，哪些应被抑制。
-* 再降回原来的维度 `D`，并加残差，让梯度可以绕过高维非线性直接流动。
+* `(·) @ W4` 对应 `lin2`
 
 ---
 
@@ -501,7 +439,7 @@ h2 = h1 + ( silu(h1_norm @ W3 + b3) ⊙ (h1_norm @ W4 + b4) ) @ W5 + b5
 2. **FuXiJagged 堆叠多层 FuXiBlockJagged：**
 
    ```python
-   x, _ = self._fuxi(
+   x, _ = forward(
        x=x0,                # (B,N,D) 或 jagged
        x_offsets=x_offsets,
        all_timestamps=timestamps,
@@ -526,16 +464,10 @@ h2 = h1 + ( silu(h1_norm @ W3 + b3) ⊙ (h1_norm @ W4 + b4) ) @ W5 + b5
      logits = h_user @ E_items^T    # (B, num_items)
      ```
 
-   在 ReChorus 封装的 `FuXiSeq` 里，是对 `feed_dict["item_id"]` 的 embedding 做批量点积，形状 `(B, 1 + num_neg)`。
+   在 ReChorus 封装的 `FuXi` 里，是对 `feed_dict["item_id"]` 的 embedding 做批量点积，形状 `(B, 1 + num_neg)`。
 
 5. **损失 / 预测：**
 
-   * 训练时：用负采样 softmax 或 BPR loss 等，`Adam` 更新所有参数（embedding、_uvqk、MFFN、偏置等）。
-   * 测试时：对 `logits` 取 top-K 就是推荐结果。
+   * 训练时：用负采样 softmax 或 BPR loss 等，`Adam` 更新所有参数（embedding、_uvqk、MFFN等）。
+   * 测试时：取 top-K 就是推荐结果。用 HR 和 NG 评分。
 
----
-
-如果你愿意，我可以在这个 `.md` 基础上，再帮你加上：
-
-* 某个具体配置（比如 `H=4, D=64, D_lin=32`）下的**具体数值例子**；
-* 把关键几步（AMS 的三次 `einsum` + MFFN 两阶段）画成**小表格**，专门列出“输入形状 -> 运算 -> 输出形状”，方便你在论文里直接截图 / 改写。

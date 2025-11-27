@@ -1,6 +1,8 @@
 # FuXi-alpha x ReChorus 参数手册
 
-本文档汇总了使用 `python ReChorus/src/main.py` 训练 FuXi 模型时会用到的全部命令行参数、默认值以及作用。参数按解析顺序从外到内分组，覆盖模型选择、全局控制、数据读取、训练调度以及 FuXi 专属超参。
+文件夹 `ReChorus/src/models` 下加入了 `fuxi.py` 文件，包含了 `fuxi-alpha` 模型的关键算法。其余大量加载、初步处理数据的函数放在 `yinyong` 文件夹下。
+
+本文档汇总了使用 `python ReChorus/src/main.py` 训练 FuXi 模型时会用到的全部命令行参数、默认值以及作用。参数按解析顺序由浅层到深层分组，覆盖模型选择、全局控制、数据读取、训练调度以及 FuXi 专属超参。
 
 > **使用方法**：所有参数都可以通过 CLI 传入，例如  
 > `python ReChorus/src/main.py --model_name FuXi --dataset Beauty --history_max 50 --fuxi_blocks 3 ...`
@@ -79,5 +81,17 @@
 ## 7. 参数依赖与建议
 - **路径设置**：`--path`、`--log_file`、`--model_path` 都是相对 `ReChorus/src/main.py` 运行位置解析的。推荐在仓库根目录执行命令，并使用默认的相对路径结构。
 - **加载既有模型**：若要仅评估某个 `.pt` checkpoint，设置 `--load 1 --train 0`，同时把 `--model_path` 指向目标文件。
+
+
+## 8. 论文推荐超参对比
+
+| 超参 | ReChorus 论文/官方脚本 | FuXi-α 论文/官方脚本 | 备注 |
+| --- | --- | --- | --- |
+| 序列长度 | `history_max = 20`，大部分 Top-K 脚本都将用户历史截断到 20（例如 `docs/demo_scripts_results/Topk_Amazon.sh` 中的所有模型）。 | `max_sequence_length = 200`，在 `yinyong/generative_recommenders/trainer/train.py` 的 `train_fn` 默认值中直接拉长时间窗口 | FuXi-α 专注于长序列建模，因此显著放大历史长度。 |
+| 嵌入维度 | 多数 ReChorus 模型以 `emb_size = 64` 为基准（同样可见于 `Topk_Amazon.sh:18-42` 等脚本）。 | FuXi-α 默认 `item_embedding_dim = 240`，并在 ReChorus 封装里以 `--emb_size` 传入 (`yinyong/.../trainer/train.py:113-118` 与 `src/models/sequential/fuxi.py:862-900`)。 | FuXi-α 依赖 AMS/MFFN 结构，内部维度更宽。 |
+| 批大小 | 若未显式指定，Runner 默认 `batch_size = 256` (`src/helpers/BaseRunner.py:18-42`)，而 ReChorus 论文的大多数实验沿用该默认值。 | FuXi-α 训练器默认 `local_batch_size = 128`，`eval_batch_size = 128` (`train.py:88-100`)。 | FuXi 采用更小批次以适配更长序列。 |
+| 负样本数 | `--num_neg = 1` 为基础设定 (`src/models/BaseModel.py:22-64`)；Top-K Amazon 等脚本也是 1。 | `num_negatives` 默认为 1，但在 FuXi-α 论文的 gin 脚本里常被提升到大批次采样（ReChorus 中可通过 `--num_neg` 调整）。 | 两者都支持命令行覆写。 |
+| 学习率 / 权重衰减 | 官方脚本多用 `lr = 1e-3` 搭配 `l2` 范围在 `1e-6 ~ 1e-4` (`Topk_Amazon.sh` 多条命令)。 | `learning_rate = 1e-3`、`weight_decay = 1e-3` 是 FuXi-α 默认 (`train.py:100-108`)，衰减更强以稳定深层 AMS。 | FuXi-α 同时引入 `num_warmup_steps = 0` 与长期训练 (`num_epochs = 101`)。 |
+| Dropout | 绝大多数 ReChorus 模型默认 `--dropout 0`（无显式传值即保持 `BaseModel` 默认）。 | FuXi-α 默认 `dropout_rate = 0.2` (`train.py:95-99`)，配合 AMS/MFFN 使用。 | 反映两篇论文在模型容量与正则化上的差异。 |
 
 

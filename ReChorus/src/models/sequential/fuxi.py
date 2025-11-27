@@ -28,7 +28,7 @@ if _YINYONG_ROOT.exists():
 # --- fbgemm-gpu 依赖检测 ---
 try:
     import fbgemm_gpu  # noqa: F401
-except ImportError as exc:  # 给出友好提示
+except ImportError as exc:  
     raise ImportError(
         "FuXi 依赖 fbgemm-gpu，请先安装与当前 CUDA 版本匹配的 wheel"
     ) from exc

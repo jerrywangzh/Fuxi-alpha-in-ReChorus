@@ -1,0 +1,19 @@
+COMMON_GROCERY="--model_name FuXi --dataset Grocery_and_Gourmet_Food --path data \
+--history_max 50 --gpu 0 --lr 1e-3 --l2 0 --epoch 200 --early_stop 10 \
+ --batch_size 256 --eval_batch_size 256 --num_neg 1 --dropout 0.1 \
+--metric NDCG,HR --topk 5,10,20,50 \
+--emb_size 240 --fuxi_heads 4 --fuxi_attention_dim 64 --fuxi_linear_dim 64 \
+--fuxi_linear_activation silu --fuxi_linear_dropout 0.1 --fuxi_attn_dropout 0.1 \
+--fuxi_ffn_multiply 1.0 --fuxi_ffn_single_stage 0 --fuxi_enable_rel_bias 1"
+
+PARENT_DIR=/mnt/e/collegeitem/third1/machinelearning/Fuxi-alpha-in-ReChorus
+MODEL_DIR="${PARENT_DIR}/models_saved"
+LOG_DIR="${PARENT_DIR}/logs_saved"
+depth=4
+
+python src/main.py  $COMMON_GROCERY \
+    --fuxi_blocks $depth \
+    --model_path "${MODEL_DIR}/fuxi_grocery_${depth}.pt" \
+    --log_file   "${LOG_DIR}/fuxi_grocery_${depth}_test.txt" \
+    --load 1 \
+    --train 0

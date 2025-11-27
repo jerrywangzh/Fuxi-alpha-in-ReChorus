@@ -1,0 +1,143 @@
+INFO:root:Namespace(model_name='FuXi', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-27 12:10:47 ---------------------------------------------
+INFO:root:
+===============================================
+ Arguments              | Values               
+===============================================
+ batch_size             | 256                 
+ data_appendix          |                     
+ dataset                | Grocery_and_Gourm...
+ dropout                | 0.1                 
+ early_stop             | 10                  
+ emb_size               | 240                 
+ epoch                  | 200                 
+ eval_batch_size        | 256                 
+ fuxi_attention_dim     | 64                  
+ fuxi_attn_dropout      | 0.1                 
+ fuxi_blocks            | 8                   
+ fuxi_enable_rel_bias   | 1                   
+ fuxi_ffn_multiply      | 1.0                 
+ fuxi_ffn_single_stage  | 0                   
+ fuxi_heads             | 4                   
+ fuxi_linear_activation | silu                
+ fuxi_linear_dim        | 64                  
+ fuxi_linear_dropout    | 0.1                 
+ gpu                    | 0                   
+ history_max            | 50                  
+ l2                     | 0.0                 
+ lr                     | 0.001               
+ main_metric            |                     
+ num_neg                | 1                   
+ num_workers            | 5                   
+ optimizer              | Adam                
+ random_seed            | 0                   
+ save_final_results     | 1                   
+ test_all               | 0                   
+ topk                   | 5,10,20,50          
+===============================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/Grocery_and_Gourmet_Food/SeqReader.pkl
+INFO:root:#params: 7913680
+INFO:root:FuXi(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(8715, 240, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(51, 240)
+    (_emb_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): FuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(8715, 240, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(51, 240)
+      (_emb_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-7): 8 x FuXiBlockJagged(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=768, out_features=240, bias=True)
+            (lin1): Linear(in_features=240, out_features=240, bias=False)
+            (lin2): Linear(in_features=240, out_features=240, bias=False)
+            (lin3): Linear(in_features=240, out_features=240, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0494,NDCG@5:0.0296,HR@10:0.0967,NDCG@10:0.0448,HR@20:0.1980,NDCG@20:0.0701,HR@50:0.5063,NDCG@50:0.1303)
+INFO:root:Optimizer: Adam
+INFO:root:Epoch 1     loss=0.6176 [41.8 s]	dev=(HR@5:0.2468,NDCG@5:0.1639) [2.2 s] *
+INFO:root:Epoch 2     loss=0.4949 [43.8 s]	dev=(HR@5:0.2488,NDCG@5:0.1638) [2.2 s]
+INFO:root:Epoch 3     loss=0.4533 [43.7 s]	dev=(HR@5:0.2571,NDCG@5:0.1692) [2.3 s] *
+INFO:root:Epoch 4     loss=0.4327 [43.5 s]	dev=(HR@5:0.2839,NDCG@5:0.1882) [2.2 s] *
+INFO:root:Epoch 5     loss=0.4127 [45.7 s]	dev=(HR@5:0.3020,NDCG@5:0.2002) [2.2 s] *
+INFO:root:Epoch 6     loss=0.3962 [44.5 s]	dev=(HR@5:0.3180,NDCG@5:0.2113) [2.2 s] *
+INFO:root:Epoch 7     loss=0.3841 [46.9 s]	dev=(HR@5:0.3235,NDCG@5:0.2155) [2.6 s] *
+INFO:root:Epoch 8     loss=0.3720 [45.4 s]	dev=(HR@5:0.3270,NDCG@5:0.2159) [2.4 s] *
+INFO:root:Epoch 9     loss=0.3615 [45.8 s]	dev=(HR@5:0.3319,NDCG@5:0.2195) [2.3 s] *
+INFO:root:Epoch 10    loss=0.3523 [47.2 s]	dev=(HR@5:0.3321,NDCG@5:0.2201) [2.3 s] *
+INFO:root:Epoch 11    loss=0.3427 [46.4 s]	dev=(HR@5:0.3383,NDCG@5:0.2251) [2.4 s] *
+INFO:root:Epoch 12    loss=0.3325 [47.0 s]	dev=(HR@5:0.3381,NDCG@5:0.2242) [2.3 s]
+INFO:root:Epoch 13    loss=0.3243 [46.4 s]	dev=(HR@5:0.3451,NDCG@5:0.2325) [2.5 s] *
+INFO:root:Epoch 14    loss=0.3173 [47.2 s]	dev=(HR@5:0.3423,NDCG@5:0.2318) [2.4 s]
+INFO:root:Epoch 15    loss=0.3091 [47.0 s]	dev=(HR@5:0.3488,NDCG@5:0.2380) [2.4 s] *
+INFO:root:Epoch 16    loss=0.3020 [46.8 s]	dev=(HR@5:0.3515,NDCG@5:0.2407) [2.4 s] *
+INFO:root:Epoch 17    loss=0.2933 [47.4 s]	dev=(HR@5:0.3620,NDCG@5:0.2485) [2.4 s] *
+INFO:root:Epoch 18    loss=0.2867 [47.8 s]	dev=(HR@5:0.3616,NDCG@5:0.2484) [2.4 s]
+INFO:root:Epoch 19    loss=0.2784 [47.9 s]	dev=(HR@5:0.3631,NDCG@5:0.2495) [2.5 s] *
+INFO:root:Epoch 20    loss=0.2736 [47.4 s]	dev=(HR@5:0.3647,NDCG@5:0.2521) [2.4 s] *
+INFO:root:Epoch 21    loss=0.2626 [47.7 s]	dev=(HR@5:0.3700,NDCG@5:0.2567) [2.4 s] *
+INFO:root:Epoch 22    loss=0.2589 [47.2 s]	dev=(HR@5:0.3680,NDCG@5:0.2550) [2.6 s]
+INFO:root:Epoch 23    loss=0.2540 [48.5 s]	dev=(HR@5:0.3691,NDCG@5:0.2583) [2.4 s] *
+INFO:root:Epoch 24    loss=0.2475 [47.3 s]	dev=(HR@5:0.3708,NDCG@5:0.2569) [2.4 s]
+INFO:root:Epoch 25    loss=0.2381 [47.7 s]	dev=(HR@5:0.3636,NDCG@5:0.2538) [1.7 s]
+INFO:root:Epoch 26    loss=0.2355 [47.7 s]	dev=(HR@5:0.3733,NDCG@5:0.2613) [2.5 s] *
+INFO:root:Epoch 27    loss=0.2283 [47.1 s]	dev=(HR@5:0.3779,NDCG@5:0.2672) [2.4 s] *
+INFO:root:Epoch 28    loss=0.2237 [47.9 s]	dev=(HR@5:0.3736,NDCG@5:0.2637) [2.4 s]
+INFO:root:Epoch 29    loss=0.2182 [47.2 s]	dev=(HR@5:0.3768,NDCG@5:0.2677) [2.4 s] *
+INFO:root:Epoch 30    loss=0.2120 [47.9 s]	dev=(HR@5:0.3773,NDCG@5:0.2689) [2.4 s] *
+INFO:root:Epoch 31    loss=0.2074 [46.4 s]	dev=(HR@5:0.3789,NDCG@5:0.2714) [2.4 s] *
+INFO:root:Epoch 32    loss=0.2046 [47.8 s]	dev=(HR@5:0.3851,NDCG@5:0.2760) [2.4 s] *
+INFO:root:Epoch 33    loss=0.1965 [47.3 s]	dev=(HR@5:0.3812,NDCG@5:0.2737) [2.4 s]
+INFO:root:Epoch 34    loss=0.1931 [47.4 s]	dev=(HR@5:0.3816,NDCG@5:0.2748) [2.4 s]
+INFO:root:Epoch 35    loss=0.1889 [46.4 s]	dev=(HR@5:0.3795,NDCG@5:0.2749) [2.4 s]
+INFO:root:Epoch 36    loss=0.1845 [47.2 s]	dev=(HR@5:0.3844,NDCG@5:0.2799) [2.4 s] *
+INFO:root:Epoch 37    loss=0.1805 [46.6 s]	dev=(HR@5:0.3840,NDCG@5:0.2807) [2.4 s] *
+INFO:root:Epoch 38    loss=0.1762 [47.2 s]	dev=(HR@5:0.3839,NDCG@5:0.2802) [2.4 s]
+INFO:root:Epoch 39    loss=0.1721 [46.8 s]	dev=(HR@5:0.3866,NDCG@5:0.2827) [2.4 s] *
+INFO:root:Epoch 40    loss=0.1680 [47.6 s]	dev=(HR@5:0.3887,NDCG@5:0.2864) [2.3 s] *
+INFO:root:Epoch 41    loss=0.1654 [46.7 s]	dev=(HR@5:0.3866,NDCG@5:0.2844) [2.6 s]
+INFO:root:Epoch 42    loss=0.1613 [49.2 s]	dev=(HR@5:0.3857,NDCG@5:0.2845) [2.4 s]
+INFO:root:Epoch 43    loss=0.1574 [47.2 s]	dev=(HR@5:0.3940,NDCG@5:0.2909) [2.4 s] *
+INFO:root:Epoch 44    loss=0.1552 [45.7 s]	dev=(HR@5:0.3909,NDCG@5:0.2885) [2.4 s]
+INFO:root:Epoch 45    loss=0.1487 [47.4 s]	dev=(HR@5:0.3890,NDCG@5:0.2874) [2.4 s]
+INFO:root:Epoch 46    loss=0.1481 [46.5 s]	dev=(HR@5:0.3923,NDCG@5:0.2900) [2.4 s]
+INFO:root:Epoch 47    loss=0.1452 [47.3 s]	dev=(HR@5:0.3870,NDCG@5:0.2864) [2.3 s]
+INFO:root:Epoch 48    loss=0.1413 [46.7 s]	dev=(HR@5:0.3921,NDCG@5:0.2902) [2.4 s]
+INFO:root:Epoch 49    loss=0.1370 [47.4 s]	dev=(HR@5:0.3901,NDCG@5:0.2880) [2.4 s]
+INFO:root:Epoch 50    loss=0.1362 [47.3 s]	dev=(HR@5:0.3887,NDCG@5:0.2879) [2.3 s]
+INFO:root:Epoch 51    loss=0.1323 [47.0 s]	dev=(HR@5:0.3882,NDCG@5:0.2876) [2.4 s]
+INFO:root:Epoch 52    loss=0.1298 [46.9 s]	dev=(HR@5:0.3879,NDCG@5:0.2869) [2.4 s]
+INFO:root:Early stop at 52 based on dev result.
+INFO:root:
+Best Iter(dev)=   43	 dev=(HR@5:0.3940,NDCG@5:0.2909) [2563.7 s] 
+INFO:root:Load model from /mnt/e/collegeitem/third1/machinelearning/Fuxi-alpha-in-ReChorus/models_saved/fuxi_grocery_8.pt
+INFO:root:
+Dev  After Training: (HR@5:0.3940,NDCG@5:0.2909,HR@10:0.4867,NDCG@10:0.3210,HR@20:0.5859,NDCG@20:0.3459,HR@50:0.7683,NDCG@50:0.3818)
+INFO:root:
+Test After Training: (HR@5:0.3541,NDCG@5:0.2520,HR@10:0.4473,NDCG@10:0.2822,HR@20:0.5500,NDCG@20:0.3080,HR@50:0.7425,NDCG@50:0.3459)
+INFO:root:Saving top-100 recommendation results to: /mnt/e/collegeitem/third1/machinelearning/Fuxi-alpha-in-ReChorus/logs_saved/fuxi_grocery_8/rec-FuXi-dev.csv
+INFO:root:dev Prediction results saved!
+INFO:root:Saving top-100 recommendation results to: /mnt/e/collegeitem/third1/machinelearning/Fuxi-alpha-in-ReChorus/logs_saved/fuxi_grocery_8/rec-FuXi-test.csv
+INFO:root:test Prediction results saved!
+INFO:root:
+--------------------------------------------- END: 2025-11-27 12:53:53 ---------------------------------------------

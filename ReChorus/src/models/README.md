@@ -39,8 +39,12 @@
   其中 `sum_i N_i` 是当前 batch 中所有序列长度之和。
 * `x_offsets` : `(B + 1,)`，记录每个序列在 `x_flat` 里的起止位置，`x[i+1] - x[i]` 即当前序列长度
 
-# Fuxi 的时间复杂度主要集中在 AMS ,尤其是 语义块 的计算中，其中涉及多次矩阵乘法。对于语义块，一个 batch 会耗时 o(B * N * N * H * D_attn) + o(B * N * N * H * D_lin) ~ o(2 * B * N^2 * H * max{D_attn,D_lin}) 。
-# 因此 Fuxi 使用 fbgemm_gpu 高效算子进行运算。会将序列规定长度 N 在计算中换成实际长度 N_i ，稀疏化计算 + 自带功能优化 使得复杂时间任务能高效完成。这也是 Fuxi 堆叠 fuxiblock 形成深层网络 和 训练工业数据集（亿级点击量）的基础
+---
+
+Fuxi 的时间复杂度主要集中在 AMS ,尤其是 语义块 的计算中，其中涉及多次矩阵乘法。对于语义块，一个 batch 会耗时 o(B * N * N * H * D_attn) + o(B * N * N * H * D_lin) ~ o(2 * B * N^2 * H * max{D_attn,D_lin}) 。
+
+因此 Fuxi 使用 fbgemm_gpu 高效算子进行运算。会将序列规定长度 N 在计算中换成实际长度 N_i ，稀疏化计算 + 自带功能优化 使得复杂时间任务能高效完成。这也是 Fuxi 堆叠 fuxiblock 形成深层网络 和 训练工业数据集（亿级点击量）的基础
+
 # 下面解释 AMS 和 MFFN 时，会交替用 `(B, N, ·)`（dense）与 `(sum_i N_i, ·)` 也可写作 `(sumN, ·)` （jagged）两种视角。
 
 ---
@@ -49,7 +53,7 @@
 
 ### 1.1 输入与输出（AMS 这块）
 
-AMS 模块所在的 `FuXiBlockJagged.forward` 签名：
+AMS 模块所在的 `FuXiBlockJagged.forward` ：
 
 ```python
 def forward(
@@ -107,7 +111,7 @@ if self._linear_activation == "silu":
     batched_mm_output = F.silu(batched_mm_output)
 ```
 
-SiLU 逐元素进行：
+silu 逐元素进行：
 
 ```text
 silu(z) = z * sigmoid(z)
@@ -126,7 +130,6 @@ u, v, q, k = torch.split(
     ],
     dim=1,               # 按 1 维度拆解，0 维度长度是sum_i N_i。
 )
-
 
 ### 1.4 jagged 转 dense：构造 `(B, N, H, D_attn)` 和 `(B, N, H, D_lin)`
 

@@ -1,5 +1,5 @@
 
-Fuxi 训练参数 （ipynb格式） （另一个数据集用Movielens_1M，更改 --dataset 改变数据集）
+fuxi 训练参数 （ipynb格式） （另一个数据集用Movielens_1M，更改 --dataset 改变数据集）
 
 COMMON_MOVIELENS = (
     "--dataset Grocery_and_Gourmet_Food --path data "
@@ -16,11 +16,12 @@ for depth in [2, 4, 8, 16, 32]:   #在选用 Movielens_1M 改为 [2, 4, 8]
     model_path = f"{MODEL_DIR}/fuxi_grocery_{depth}.pt"   #自行更改保存地址
     log_file   = f"{LOG_DIR}/fuxi_grocery_{depth}.txt"    #自行更改保存地址
 
-    print(f"=== 训练 Fuxi, num_layers={depth}，保存到: {model_path} ===")
+    print(f"=== 训练 fuxi, num_layers={depth}，保存到: {model_path} ===")
     !python src/main.py $COMMON_MOVIELENS \
-        --model_name Fuxi \
+        --model_name fuxi \
         --model_path {model_path} \
         --log_file {log_file} \
+        --fuxi_blocks {depth} \
         --save_final_results 0
 
 

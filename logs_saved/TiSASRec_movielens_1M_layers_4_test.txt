@@ -1,0 +1,63 @@
+INFO:root:Namespace(model_name='TiSASRec', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-28 07:14:32 ---------------------------------------------
+INFO:root:
+===================================
+ Arguments          | Values       
+===================================
+ batch_size         | 256         
+ data_appendix      |             
+ dataset            | MovieLens_1M
+ dropout            | 0.1         
+ early_stop         | 10          
+ emb_size           | 240         
+ epoch              | 200         
+ eval_batch_size    | 256         
+ gpu                | 0           
+ history_max        | 50          
+ l2                 | 0.0         
+ lr                 | 0.001       
+ main_metric        |             
+ num_heads          | 4           
+ num_layers         | 4           
+ num_neg            | 1           
+ num_workers        | 5           
+ optimizer          | Adam        
+ random_seed        | 0           
+ save_final_results | 0           
+ test_all           | 0           
+ time_max           | 512         
+ topk               | 5,10,20,50  
+===================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/MovieLens_1M/SeqReader.pkl
+INFO:root:#params: 2380080
+INFO:root:TiSASRec(
+  (i_embeddings): Embedding(3953, 240)
+  (p_k_embeddings): Embedding(51, 240)
+  (p_v_embeddings): Embedding(51, 240)
+  (t_k_embeddings): Embedding(513, 240)
+  (t_v_embeddings): Embedding(513, 240)
+  (transformer_block): ModuleList(
+    (0-3): 4 x TimeIntervalTransformerLayer(
+      (masked_attn_head): TimeIntervalMultiHeadAttention(
+        (v_linear): Linear(in_features=240, out_features=240, bias=True)
+        (k_linear): Linear(in_features=240, out_features=240, bias=True)
+        (q_linear): Linear(in_features=240, out_features=240, bias=True)
+      )
+      (layer_norm1): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (linear1): Linear(in_features=240, out_features=240, bias=True)
+      (linear2): Linear(in_features=240, out_features=240, bias=True)
+      (layer_norm2): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0520,NDCG@5:0.0301,HR@10:0.1036,NDCG@10:0.0466,HR@20:0.1960,NDCG@20:0.0697,HR@50:0.4841,NDCG@50:0.1259)
+INFO:root:Load model from /content/Fuxi-alpha-in-ReChorus/models_saved/TiSASRec_movielens_1M_layers_4.pt
+INFO:root:
+Dev  After Training: (HR@5:0.3935,NDCG@5:0.2626,HR@10:0.5558,NDCG@10:0.3152,HR@20:0.7439,NDCG@20:0.3627,HR@50:0.9522,NDCG@50:0.4047)
+INFO:root:
+Test After Training: (HR@5:0.3838,NDCG@5:0.2584,HR@10:0.5555,NDCG@10:0.3137,HR@20:0.7404,NDCG@20:0.3605,HR@50:0.9417,NDCG@50:0.4009)
+INFO:root:
+--------------------------------------------- END: 2025-11-28 07:14:40 ---------------------------------------------

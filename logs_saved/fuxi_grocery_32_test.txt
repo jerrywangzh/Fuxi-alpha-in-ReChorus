@@ -73,3 +73,90 @@ INFO:root:FuXi(
     )
   )
 )
+INFO:root:Namespace(model_name='FuXi', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-27 17:24:14 ---------------------------------------------
+INFO:root:
+===============================================
+ Arguments              | Values               
+===============================================
+ batch_size             | 256                 
+ data_appendix          |                     
+ dataset                | Grocery_and_Gourm...
+ dropout                | 0.1                 
+ early_stop             | 10                  
+ emb_size               | 240                 
+ epoch                  | 200                 
+ eval_batch_size        | 256                 
+ fuxi_attention_dim     | 64                  
+ fuxi_attn_dropout      | 0.1                 
+ fuxi_blocks            | 32                  
+ fuxi_enable_rel_bias   | 1                   
+ fuxi_ffn_multiply      | 1.0                 
+ fuxi_ffn_single_stage  | 0                   
+ fuxi_heads             | 4                   
+ fuxi_linear_activation | silu                
+ fuxi_linear_dim        | 64                  
+ fuxi_linear_dropout    | 0.1                 
+ gpu                    | 0                   
+ history_max            | 50                  
+ l2                     | 0.0                 
+ lr                     | 0.001               
+ main_metric            |                     
+ num_neg                | 1                   
+ num_workers            | 5                   
+ optimizer              | Adam                
+ random_seed            | 0                   
+ save_final_results     | 1                   
+ test_all               | 0                   
+ topk                   | 5,10,20,50          
+===============================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/Grocery_and_Gourmet_Food/SeqReader.pkl
+INFO:root:#params: 25343200
+INFO:root:FuXi(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(8715, 240, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(51, 240)
+    (_emb_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): FuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(8715, 240, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(51, 240)
+      (_emb_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-31): 32 x FuXiBlockJagged(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=768, out_features=240, bias=True)
+            (lin1): Linear(in_features=240, out_features=240, bias=False)
+            (lin2): Linear(in_features=240, out_features=240, bias=False)
+            (lin3): Linear(in_features=240, out_features=240, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0517,NDCG@5:0.0302,HR@10:0.1007,NDCG@10:0.0459,HR@20:0.2025,NDCG@20:0.0712,HR@50:0.5055,NDCG@50:0.1304)
+INFO:root:Load model from /content/Fuxi-alpha-in-ReChorus/models_saved/fuxi_grocery_32.pt
+INFO:root:
+Dev  After Training: (HR@5:0.3455,NDCG@5:0.2316,HR@10:0.4697,NDCG@10:0.2721,HR@20:0.5811,NDCG@20:0.3003,HR@50:0.7641,NDCG@50:0.3364)
+INFO:root:
+Test After Training: (HR@5:0.2984,NDCG@5:0.1950,HR@10:0.4289,NDCG@10:0.2375,HR@20:0.5414,NDCG@20:0.2659,HR@50:0.7224,NDCG@50:0.3016)
+INFO:root:Saving top-100 recommendation results to: /content/Fuxi-alpha-in-ReChorus/logs_saved/fuxi_grocery_32_test/rec-FuXi-dev.csv
+INFO:root:dev Prediction results saved!
+INFO:root:Saving top-100 recommendation results to: /content/Fuxi-alpha-in-ReChorus/logs_saved/fuxi_grocery_32_test/rec-FuXi-test.csv
+INFO:root:test Prediction results saved!
+INFO:root:
+--------------------------------------------- END: 2025-11-27 17:24:44 ---------------------------------------------

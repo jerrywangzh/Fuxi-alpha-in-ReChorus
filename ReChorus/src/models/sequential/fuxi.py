@@ -25,20 +25,6 @@ if _YINYONG_ROOT.exists():
     if yinyong_path not in sys.path:
         sys.path.insert(0, yinyong_path)
 
-# --- fbgemm-gpu 依赖检测 ---
-try:
-    import fbgemm_gpu  # noqa: F401
-except ImportError as exc:  
-    raise ImportError(
-        "FuXi 依赖 fbgemm-gpu，请先安装与当前 CUDA 版本匹配的 wheel"
-    ) from exc
-
-_REQUIRED_OPS = ["dense_to_jagged", "jagged_to_padded_dense", "asynchronous_complete_cumsum"]
-if not hasattr(torch.ops, "fbgemm") or any(
-    not hasattr(torch.ops.fbgemm, op) for op in _REQUIRED_OPS
-):
-    missing_ops = [op for op in _REQUIRED_OPS if not hasattr(getattr(torch.ops.fbgemm, op, None), "__call__")]
-    raise ImportError(f"缺少 fbgemm 算子: {missing_ops}. 请重新安装 fbgemm-gpu。")
 
 # --- torch 版本兼容：若无 rms_norm 则退化为 layer_norm ---
 if not hasattr(F, "rms_norm"):

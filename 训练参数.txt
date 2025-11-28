@@ -1,19 +1,73 @@
-COMMON_GROCERY="--model_name FuXi --dataset Grocery_and_Gourmet_Food --path data \
---history_max 50 --gpu 0 --lr 1e-3 --l2 0 --epoch 200 --early_stop 10 \
- --batch_size 256 --eval_batch_size 256 --num_neg 1 --dropout 0.1 \
---metric NDCG,HR --topk 5,10,20,50 \
---emb_size 240 --fuxi_heads 4 --fuxi_attention_dim 64 --fuxi_linear_dim 64 \
---fuxi_linear_activation silu --fuxi_linear_dropout 0.1 --fuxi_attn_dropout 0.1 \
---fuxi_ffn_multiply 1.0 --fuxi_ffn_single_stage 0 --fuxi_enable_rel_bias 1"
 
-PARENT_DIR=/mnt/e/collegeitem/third1/machinelearning/Fuxi-alpha-in-ReChorus
-MODEL_DIR="${PARENT_DIR}/models_saved"
-LOG_DIR="${PARENT_DIR}/logs_saved"
-depth=4
+Fuxi 训练参数 （ipynb格式） （另一个数据集用Movielens_1M，更改 --dataset 改变数据集）
 
-python src/main.py  $COMMON_GROCERY \
-    --fuxi_blocks $depth \
-    --model_path "${MODEL_DIR}/fuxi_grocery_${depth}.pt" \
-    --log_file   "${LOG_DIR}/fuxi_grocery_${depth}_test.txt" \
-    --load 1 \
-    --train 0
+COMMON_MOVIELENS = (
+    "--dataset Grocery_and_Gourmet_Food --path data "
+    "--history_max 50 --gpu 0 --lr 1e-3 --l2 0 --epoch 200 --early_stop 10 "
+    "--batch_size 256 --eval_batch_size 256 --num_neg 1 --dropout 0.1 "
+    "--metric NDCG,HR --topk 5,10,20,50 "
+    "--emb_size 240 "
+    "--fuxi_heads 4 --fuxi_attention_dim 64 --fuxi_linear_dim 64 "
+    "--fuxi_linear_activation silu --fuxi_linear_dropout 0.1 --fuxi_attn_dropout 0.1 "
+    "--fuxi_ffn_multiply 1.0 --fuxi_ffn_single_stage 0 --fuxi_enable_rel_bias 1 "
+)
+
+for depth in [2, 4, 8, 16, 32]:   #在选用 Movielens_1M 改为 [2, 4, 8]
+    model_path = f"{MODEL_DIR}/fuxi_grocery_{depth}.pt"   #自行更改保存地址
+    log_file   = f"{LOG_DIR}/fuxi_grocery_{depth}.txt"    #自行更改保存地址
+
+    print(f"=== 训练 Fuxi, num_layers={depth}，保存到: {model_path} ===")
+    !python src/main.py $COMMON_MOVIELENS \
+        --model_name Fuxi \
+        --model_path {model_path} \
+        --log_file {log_file} \
+        --save_final_results 0
+
+
+
+SASRec 训练参数 （ipynb格式） （另一个数据集用Movielens_1M，更改 --dataset 改变数据集）
+
+COMMON_MOVIELENS = (
+    "--dataset Grocery_and_Gourmet_Food --path data "
+    "--history_max 50 --gpu 0 --lr 1e-3 --l2 0 --epoch 200 --early_stop 10 "
+    "--batch_size 256 --eval_batch_size 256 --num_neg 1 --dropout 0.1 "
+    "--metric NDCG,HR --topk 5,10,20,50 "
+    "--emb_size 240"
+)
+
+for depth in [2, 4, 8, 16, 32]:   #在选用 Movielens_1M 改为 [2, 4, 8]
+    model_path = f"{MODEL_DIR}/SASRec_grocery_layers_{depth}.pt"    #自行更改保存地址
+    log_file   = f"{LOG_DIR}/SASRec_grocery_layers_{depth}.txt"     #自行更改保存地址
+
+    print(f"=== 训练 SASRec, num_layers={depth}，保存到: {model_path} ===")
+    !python src/main.py $COMMON_MOVIELENS \
+        --model_name SASRec \
+        --num_layers {depth} \
+        --num_heads 4 \
+        --model_path {model_path} \
+        --log_file {log_file} \
+        --save_final_results 0
+
+
+TiSASRec 训练参数 （ipynb格式） （另一个数据集用Movielens_1M，更改 --dataset 改变数据集）
+
+COMMON_MOVIELENS = (
+    "--dataset Grocery_and_Gourmet_Food --path data "
+    "--history_max 50 --gpu 0 --lr 1e-3 --l2 0 --epoch 200 --early_stop 10 "
+    "--batch_size 256 --eval_batch_size 256 --num_neg 1 --dropout 0.1 "
+    "--metric NDCG,HR --topk 5,10,20,50 "
+    "--emb_size 240"
+)
+
+for depth in [2,4,8,16,32]:   #在选用 Movielens_1M 改为 [2, 4, 8]
+    model_path = f"{MODEL_DIR}/TiSASRec_grocery_1M_layers_{depth}.pt"   #自行更改保存地址
+    log_file   = f"{LOG_DIR}/TiSASRec_grocery_1M_layers_{depth}.txt"    #自行更改保存地址
+
+    print(f"=== 训练 TiSASRec, num_layers={depth}，保存到: {model_path} ===")
+    !python src/main.py $COMMON_MOVIELENS \
+        --model_name TiSASRec \
+        --num_layers {depth} \
+        --num_heads 4 \
+        --model_path {model_path} \
+        --log_file {log_file}  \
+        --save_final_results 0

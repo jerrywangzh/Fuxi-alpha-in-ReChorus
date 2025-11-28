@@ -17,6 +17,18 @@ from models.context_seq import *
 from models.reranker import *
 from utils import utils
 
+import numpy as np
+
+# 兼容 NumPy 2.x：补回 np.int 等老别名，避免第三方库报 AttributeError
+if not hasattr(np, "int"):
+    np.int = int
+if not hasattr(np, "bool"):
+    np.bool = bool
+if not hasattr(np, "float"):
+    np.float = float
+if not hasattr(np, "complex"):
+    np.complex = complex
+
 
 def parse_global_args(parser):
 	parser.add_argument('--gpu', type=str, default='0',

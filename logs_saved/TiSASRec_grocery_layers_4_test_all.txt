@@ -1,0 +1,63 @@
+INFO:root:Namespace(model_name='TiSASRec', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-28 16:45:02 ---------------------------------------------
+INFO:root:
+===========================================
+ Arguments          | Values               
+===========================================
+ batch_size         | 256                 
+ data_appendix      |                     
+ dataset            | Grocery_and_Gourm...
+ dropout            | 0.1                 
+ early_stop         | 10                  
+ emb_size           | 240                 
+ epoch              | 200                 
+ eval_batch_size    | 256                 
+ gpu                | 0                   
+ history_max        | 50                  
+ l2                 | 0.0                 
+ lr                 | 0.001               
+ main_metric        |                     
+ num_heads          | 4                   
+ num_layers         | 4                   
+ num_neg            | 1                   
+ num_workers        | 5                   
+ optimizer          | Adam                
+ random_seed        | 0                   
+ save_final_results | 0                   
+ test_all           | 1                   
+ time_max           | 512                 
+ topk               | 5,10,20,50          
+===========================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/Grocery_and_Gourmet_Food/SeqReader.pkl
+INFO:root:#params: 3522720
+INFO:root:TiSASRec(
+  (i_embeddings): Embedding(8714, 240)
+  (p_k_embeddings): Embedding(51, 240)
+  (p_v_embeddings): Embedding(51, 240)
+  (t_k_embeddings): Embedding(513, 240)
+  (t_v_embeddings): Embedding(513, 240)
+  (transformer_block): ModuleList(
+    (0-3): 4 x TimeIntervalTransformerLayer(
+      (masked_attn_head): TimeIntervalMultiHeadAttention(
+        (v_linear): Linear(in_features=240, out_features=240, bias=True)
+        (k_linear): Linear(in_features=240, out_features=240, bias=True)
+        (q_linear): Linear(in_features=240, out_features=240, bias=True)
+      )
+      (layer_norm1): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (linear1): Linear(in_features=240, out_features=240, bias=True)
+      (linear2): Linear(in_features=240, out_features=240, bias=True)
+      (layer_norm2): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0006,NDCG@5:0.0004,HR@10:0.0011,NDCG@10:0.0005,HR@20:0.0020,NDCG@20:0.0008,HR@50:0.0054,NDCG@50:0.0014)
+INFO:root:Load model from /content/Fuxi-alpha-in-ReChorus/models_saved/TiSASRec_grocery_layers_4.pt
+INFO:root:
+Dev  After Training: (HR@5:0.0265,NDCG@5:0.0174,HR@10:0.0448,NDCG@10:0.0232,HR@20:0.0748,NDCG@20:0.0307,HR@50:0.1473,NDCG@50:0.0450)
+INFO:root:
+Test After Training: (HR@5:0.0228,NDCG@5:0.0147,HR@10:0.0377,NDCG@10:0.0195,HR@20:0.0626,NDCG@20:0.0256,HR@50:0.1201,NDCG@50:0.0370)
+INFO:root:
+--------------------------------------------- END: 2025-11-28 16:45:16 ---------------------------------------------

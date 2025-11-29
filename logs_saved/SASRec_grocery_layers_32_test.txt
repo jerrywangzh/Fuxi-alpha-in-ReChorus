@@ -1,0 +1,59 @@
+INFO:root:Namespace(model_name='SASRec', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-28 16:39:14 ---------------------------------------------
+INFO:root:
+===========================================
+ Arguments          | Values               
+===========================================
+ batch_size         | 256                 
+ data_appendix      |                     
+ dataset            | Grocery_and_Gourm...
+ dropout            | 0.1                 
+ early_stop         | 10                  
+ emb_size           | 240                 
+ epoch              | 200                 
+ eval_batch_size    | 256                 
+ gpu                | 0                   
+ history_max        | 50                  
+ l2                 | 0.0                 
+ lr                 | 0.001               
+ main_metric        |                     
+ num_heads          | 4                   
+ num_layers         | 32                  
+ num_neg            | 1                   
+ num_workers        | 5                   
+ optimizer          | Adam                
+ random_seed        | 0                   
+ save_final_results | 0                   
+ test_all           | 0                   
+ topk               | 5,10,20,50          
+===========================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/Grocery_and_Gourmet_Food/SeqReader.pkl
+INFO:root:#params: 11388720
+INFO:root:SASRec(
+  (i_embeddings): Embedding(8714, 240)
+  (p_embeddings): Embedding(51, 240)
+  (transformer_block): ModuleList(
+    (0-31): 32 x TransformerLayer(
+      (masked_attn_head): MultiHeadAttention(
+        (q_linear): Linear(in_features=240, out_features=240, bias=True)
+        (k_linear): Linear(in_features=240, out_features=240, bias=True)
+        (v_linear): Linear(in_features=240, out_features=240, bias=True)
+      )
+      (layer_norm1): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (linear1): Linear(in_features=240, out_features=240, bias=True)
+      (linear2): Linear(in_features=240, out_features=240, bias=True)
+      (layer_norm2): LayerNorm((240,), eps=1e-05, elementwise_affine=True)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0531,NDCG@5:0.0321,HR@10:0.1068,NDCG@10:0.0492,HR@20:0.2057,NDCG@20:0.0739,HR@50:0.5041,NDCG@50:0.1322)
+INFO:root:Load model from /content/Fuxi-alpha-in-ReChorus/models_saved/SASRec_grocery_layers_32.pt
+INFO:root:
+Dev  After Training: (HR@5:0.2454,NDCG@5:0.1582,HR@10:0.3859,NDCG@10:0.2034,HR@20:0.5336,NDCG@20:0.2408,HR@50:0.7354,NDCG@50:0.2809)
+INFO:root:
+Test After Training: (HR@5:0.2051,NDCG@5:0.1275,HR@10:0.3361,NDCG@10:0.1697,HR@20:0.4853,NDCG@20:0.2074,HR@50:0.6903,NDCG@50:0.2480)
+INFO:root:
+--------------------------------------------- END: 2025-11-28 16:39:23 ---------------------------------------------

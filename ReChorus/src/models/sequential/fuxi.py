@@ -18,6 +18,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from models.BaseModel import SequentialModel
 
+import fbgemm_gpu
+
 # --- 将 yinyong 目录加入 sys.path，以便直接复用 FuXi-alpha 的实现 ---
 _YINYONG_ROOT = Path(__file__).resolve().parents[3] / "yinyong"
 if _YINYONG_ROOT.exists():
@@ -25,12 +27,6 @@ if _YINYONG_ROOT.exists():
     if yinyong_path not in sys.path:
         sys.path.insert(0, yinyong_path)
 
-
-# --- torch 版本兼容：若无 rms_norm 则退化为 layer_norm ---
-if not hasattr(F, "rms_norm"):
-    def _fallback_rms_norm(x: torch.Tensor, normalized_shape, eps: float = 1e-5):
-        return torch.nn.functional.layer_norm(x, normalized_shape, eps=eps)
-    F.rms_norm = _fallback_rms_norm  # type: ignore
 
 from generative_recommenders.modeling.ndp_module import NDPModule
 
@@ -946,3 +942,5 @@ class FuXi(SequentialModel):
 
     class Dataset(SequentialModel.Dataset):
         pass
+
+fuxi = FuXi

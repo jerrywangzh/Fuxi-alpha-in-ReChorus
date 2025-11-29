@@ -1,0 +1,26 @@
+COMMON_ML1M_L200 = (
+    "--dataset MovieLens_1M --path data "    
+    "--history_max 200 "
+    "--gpu 0 "
+    "--lr 1e-3 --l2 0 "
+    "--epoch 101 --early_stop 0 "                     # early_stop ，rechorus 里 runner 的专有参数，默认设置是 10 ，这里设置成 0 ，相当于不提前结束
+    "--batch_size 128 --eval_batch_size 128 "
+    "--num_neg 128 "                                   # SampledSoftmax 的负样本数
+    "--dropout 0.2 "                                   # 对应 train_fn.dropout_rate
+    "--metric NDCG,HR --topk 5,10,20,50 "
+    "--emb_size 50 "                                   # item_embedding_dim
+    "--fuxi_linear_activation silu "
+    "--fuxi_linear_dropout 0.2 --fuxi_attn_dropout 0.2 "
+    "--fuxi_ffn_multiply 1.0 --fuxi_ffn_single_stage 0 "
+    "--fuxi_enable_rel_bias 1 "
+)
+
+!python src/main.py $COMMON_ML1M_L200 \
+  --model_name fuxi \
+  --model_path models_saved/fuxi_movielens_1M_base.pt \
+  --log_file log/fuxi_movielens_1M_base.txt \
+  --fuxi_blocks 2 \
+  --fuxi_heads 1 \
+  --fuxi_attention_dim 50 \
+  --fuxi_linear_dim 50 \
+  --save_final_results 0

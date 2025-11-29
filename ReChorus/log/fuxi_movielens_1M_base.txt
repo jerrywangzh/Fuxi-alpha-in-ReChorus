@@ -1,0 +1,564 @@
+INFO:root:Namespace(model_name='fuxi', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-29 15:55:45 ---------------------------------------------
+INFO:root:
+===============================================
+ Arguments              | Values               
+===============================================
+ batch_size             | 256                 
+ data_appendix          |                     
+ dataset                | Grocery_and_Gourm...
+ dropout                | 0                   
+ early_stop             | 10                  
+ emb_size               | 240                 
+ epoch                  | 200                 
+ eval_batch_size        | 256                 
+ fuxi_attention_dim     | 50                  
+ fuxi_attn_dropout      | 0.1                 
+ fuxi_blocks            | 2                   
+ fuxi_enable_rel_bias   | 1                   
+ fuxi_ffn_multiply      | 1.0                 
+ fuxi_ffn_single_stage  | 0                   
+ fuxi_heads             | 1                   
+ fuxi_linear_activation | silu                
+ fuxi_linear_dim        | 50                  
+ fuxi_linear_dropout    | 0.1                 
+ gpu                    | 0                   
+ history_max            | 20                  
+ l2                     | 0                   
+ lr                     | 0.001               
+ main_metric            |                     
+ num_neg                | 1                   
+ num_workers            | 5                   
+ optimizer              | Adam                
+ random_seed            | 0                   
+ save_final_results     | 0                   
+ test_all               | 0                   
+ topk                   | 5,10,20,50          
+===============================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/Grocery_and_Gourmet_Food/SeqReader.pkl
+INFO:root:#params: 2659060
+INFO:root:FuXi(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(8715, 240, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(21, 240)
+    (_emb_dropout): Dropout(p=0, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): FuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(8715, 240, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(21, 240)
+      (_emb_dropout): Dropout(p=0, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-1): 2 x FuXiBlockJagged(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=150, out_features=240, bias=True)
+            (lin1): Linear(in_features=240, out_features=240, bias=False)
+            (lin2): Linear(in_features=240, out_features=240, bias=False)
+            (lin3): Linear(in_features=240, out_features=240, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Namespace(model_name='fuxi', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-29 15:56:59 ---------------------------------------------
+INFO:root:
+===============================================
+ Arguments              | Values               
+===============================================
+ batch_size             | 256                 
+ data_appendix          |                     
+ dataset                | Grocery_and_Gourm...
+ dropout                | 0                   
+ early_stop             | 10                  
+ emb_size               | 240                 
+ epoch                  | 200                 
+ eval_batch_size        | 256                 
+ fuxi_attention_dim     | 50                  
+ fuxi_attn_dropout      | 0.1                 
+ fuxi_blocks            | 2                   
+ fuxi_enable_rel_bias   | 1                   
+ fuxi_ffn_multiply      | 1.0                 
+ fuxi_ffn_single_stage  | 0                   
+ fuxi_heads             | 1                   
+ fuxi_linear_activation | silu                
+ fuxi_linear_dim        | 50                  
+ fuxi_linear_dropout    | 0.1                 
+ gpu                    | 0                   
+ history_max            | 20                  
+ l2                     | 0                   
+ lr                     | 0.001               
+ main_metric            |                     
+ num_neg                | 1                   
+ num_workers            | 5                   
+ optimizer              | Adam                
+ random_seed            | 0                   
+ save_final_results     | 0                   
+ test_all               | 0                   
+ topk                   | 5,10,20,50          
+===============================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/Grocery_and_Gourmet_Food/SeqReader.pkl
+INFO:root:#params: 2659060
+INFO:root:FuXi(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(8715, 240, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(21, 240)
+    (_emb_dropout): Dropout(p=0, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): FuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(8715, 240, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(21, 240)
+      (_emb_dropout): Dropout(p=0, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-1): 2 x FuXiBlockJagged(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=150, out_features=240, bias=True)
+            (lin1): Linear(in_features=240, out_features=240, bias=False)
+            (lin2): Linear(in_features=240, out_features=240, bias=False)
+            (lin3): Linear(in_features=240, out_features=240, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Namespace(model_name='fuxi', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-29 15:58:34 ---------------------------------------------
+INFO:root:
+===============================================
+ Arguments              | Values               
+===============================================
+ batch_size             | 256                 
+ data_appendix          |                     
+ dataset                | Grocery_and_Gourm...
+ dropout                | 0                   
+ early_stop             | 10                  
+ emb_size               | 240                 
+ epoch                  | 200                 
+ eval_batch_size        | 256                 
+ fuxi_attention_dim     | 50                  
+ fuxi_attn_dropout      | 0.1                 
+ fuxi_blocks            | 2                   
+ fuxi_enable_rel_bias   | 1                   
+ fuxi_ffn_multiply      | 1.0                 
+ fuxi_ffn_single_stage  | 0                   
+ fuxi_heads             | 1                   
+ fuxi_linear_activation | silu                
+ fuxi_linear_dim        | 50                  
+ fuxi_linear_dropout    | 0.1                 
+ gpu                    | 0                   
+ history_max            | 20                  
+ l2                     | 0                   
+ lr                     | 0.001               
+ main_metric            |                     
+ num_neg                | 1                   
+ num_workers            | 5                   
+ optimizer              | Adam                
+ random_seed            | 0                   
+ save_final_results     | 0                   
+ test_all               | 0                   
+ topk                   | 5,10,20,50          
+===============================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/Grocery_and_Gourmet_Food/SeqReader.pkl
+INFO:root:#params: 2659060
+INFO:root:FuXi(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(8715, 240, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(21, 240)
+    (_emb_dropout): Dropout(p=0, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): FuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(8715, 240, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(21, 240)
+      (_emb_dropout): Dropout(p=0, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-1): 2 x FuXiBlockJagged(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=150, out_features=240, bias=True)
+            (lin1): Linear(in_features=240, out_features=240, bias=False)
+            (lin2): Linear(in_features=240, out_features=240, bias=False)
+            (lin3): Linear(in_features=240, out_features=240, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0527,NDCG@5:0.0304,HR@10:0.1019,NDCG@10:0.0462,HR@20:0.2018,NDCG@20:0.0712,HR@50:0.5034,NDCG@50:0.1300)
+INFO:root:Optimizer: Adam
+INFO:root:Epoch 1     loss=0.5965 [7.3 s]	dev=(HR@5:0.2445,NDCG@5:0.1613) [0.5 s] *
+INFO:root:Epoch 2     loss=0.4739 [6.8 s]	dev=(HR@5:0.2603,NDCG@5:0.1711) [0.5 s] *
+INFO:root:Epoch 3     loss=0.4317 [6.9 s]	dev=(HR@5:0.3063,NDCG@5:0.2037) [0.6 s] *
+INFO:root:Epoch 4     loss=0.4047 [6.0 s]	dev=(HR@5:0.3229,NDCG@5:0.2161) [0.6 s] *
+INFO:root:Epoch 5     loss=0.3850 [6.8 s]	dev=(HR@5:0.3318,NDCG@5:0.2223) [0.7 s] *
+INFO:root:Epoch 6     loss=0.3698 [7.9 s]	dev=(HR@5:0.3359,NDCG@5:0.2265) [0.7 s] *
+INFO:root:Epoch 7     loss=0.3587 [7.5 s]	dev=(HR@5:0.3447,NDCG@5:0.2335) [0.6 s] *
+INFO:root:Epoch 8     loss=0.3474 [6.6 s]	dev=(HR@5:0.3539,NDCG@5:0.2426) [0.6 s] *
+INFO:root:Epoch 9     loss=0.3347 [7.4 s]	dev=(HR@5:0.3537,NDCG@5:0.2392) [0.6 s]
+INFO:root:Epoch 10    loss=0.3244 [7.3 s]	dev=(HR@5:0.3586,NDCG@5:0.2470) [0.6 s] *
+INFO:root:Epoch 11    loss=0.3130 [7.1 s]	dev=(HR@5:0.3686,NDCG@5:0.2566) [0.6 s] *
+INFO:root:Epoch 12    loss=0.3016 [6.4 s]	dev=(HR@5:0.3740,NDCG@5:0.2623) [0.6 s] *
+INFO:root:Epoch 13    loss=0.2912 [7.4 s]	dev=(HR@5:0.3709,NDCG@5:0.2633) [0.6 s] *
+INFO:root:Epoch 14    loss=0.2833 [7.5 s]	dev=(HR@5:0.3813,NDCG@5:0.2684) [0.6 s] *
+INFO:root:Epoch 15    loss=0.2738 [7.2 s]	dev=(HR@5:0.3815,NDCG@5:0.2709) [0.6 s] *
+INFO:root:Epoch 16    loss=0.2649 [6.6 s]	dev=(HR@5:0.3823,NDCG@5:0.2734) [0.6 s] *
+INFO:root:Early stop manually
+INFO:root:Namespace(model_name='fuxi', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-29 16:04:42 ---------------------------------------------
+INFO:root:
+===============================================
+ Arguments              | Values               
+===============================================
+ batch_size             | 256                 
+ data_appendix          |                     
+ dataset                | Grocery_and_Gourm...
+ dropout                | 0                   
+ early_stop             | 10                  
+ emb_size               | 240                 
+ epoch                  | 200                 
+ eval_batch_size        | 256                 
+ fuxi_attention_dim     | 50                  
+ fuxi_attn_dropout      | 0.1                 
+ fuxi_blocks            | 2                   
+ fuxi_enable_rel_bias   | 1                   
+ fuxi_ffn_multiply      | 1.0                 
+ fuxi_ffn_single_stage  | 0                   
+ fuxi_heads             | 1                   
+ fuxi_linear_activation | silu                
+ fuxi_linear_dim        | 50                  
+ fuxi_linear_dropout    | 0.1                 
+ gpu                    | 0                   
+ history_max            | 20                  
+ l2                     | 0                   
+ lr                     | 0.001               
+ main_metric            |                     
+ num_neg                | 1                   
+ num_workers            | 5                   
+ optimizer              | Adam                
+ random_seed            | 0                   
+ save_final_results     | 0                   
+ test_all               | 0                   
+ topk                   | 5,10,20,50          
+===============================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/Grocery_and_Gourmet_Food/SeqReader.pkl
+INFO:root:#params: 2659060
+INFO:root:FuXi(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(8715, 240, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(21, 240)
+    (_emb_dropout): Dropout(p=0, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): FuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(8715, 240, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(21, 240)
+      (_emb_dropout): Dropout(p=0, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-1): 2 x FuXiBlockJagged(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=150, out_features=240, bias=True)
+            (lin1): Linear(in_features=240, out_features=240, bias=False)
+            (lin2): Linear(in_features=240, out_features=240, bias=False)
+            (lin3): Linear(in_features=240, out_features=240, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0527,NDCG@5:0.0304,HR@10:0.1019,NDCG@10:0.0462,HR@20:0.2018,NDCG@20:0.0712,HR@50:0.5034,NDCG@50:0.1300)
+INFO:root:Optimizer: Adam
+INFO:root:Epoch 1     loss=0.5965 [7.3 s]	dev=(HR@5:0.2445,NDCG@5:0.1612) [0.6 s] *
+INFO:root:Epoch 2     loss=0.4738 [7.5 s]	dev=(HR@5:0.2614,NDCG@5:0.1715) [0.6 s] *
+INFO:root:Early stop manually
+INFO:root:Namespace(model_name='fuxi', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-29 16:08:25 ---------------------------------------------
+INFO:root:
+=======================================
+ Arguments              | Values       
+=======================================
+ batch_size             | 128         
+ data_appendix          |             
+ dataset                | MovieLens_1M
+ dropout                | 0.2         
+ early_stop             | 10          
+ emb_size               | 50          
+ epoch                  | 101         
+ eval_batch_size        | 128         
+ fuxi_attention_dim     | 50          
+ fuxi_attn_dropout      | 0.2         
+ fuxi_blocks            | 2           
+ fuxi_enable_rel_bias   | 1           
+ fuxi_ffn_multiply      | 1.0         
+ fuxi_ffn_single_stage  | 0           
+ fuxi_heads             | 1           
+ fuxi_linear_activation | silu        
+ fuxi_linear_dim        | 50          
+ fuxi_linear_dropout    | 0.2         
+ gpu                    | 0           
+ history_max            | 200         
+ l2                     | 0.0         
+ lr                     | 0.001       
+ main_metric            |             
+ num_neg                | 128         
+ num_workers            | 5           
+ optimizer              | Adam        
+ random_seed            | 0           
+ save_final_results     | 0           
+ test_all               | 0           
+ topk                   | 5,10,20,50  
+=======================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/MovieLens_1M/SeqReader.pkl
+INFO:root:#params: 268910
+INFO:root:FuXi(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(3954, 50, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(201, 50)
+    (_emb_dropout): Dropout(p=0.2, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): FuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(3954, 50, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(201, 50)
+      (_emb_dropout): Dropout(p=0.2, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-1): 2 x FuXiBlockJagged(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=150, out_features=50, bias=True)
+            (lin1): Linear(in_features=50, out_features=50, bias=False)
+            (lin2): Linear(in_features=50, out_features=50, bias=False)
+            (lin3): Linear(in_features=50, out_features=50, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0427,NDCG@5:0.0253,HR@10:0.0944,NDCG@10:0.0419,HR@20:0.1930,NDCG@20:0.0664,HR@50:0.4997,NDCG@50:0.1263)
+INFO:root:Optimizer: Adam
+INFO:root:Epoch 1     loss=0.4281 [347.4 s]	dev=(HR@5:0.6008,NDCG@5:0.4357) [0.9 s] *
+INFO:root:Epoch 2     loss=0.3200 [353.5 s]	dev=(HR@5:0.6985,NDCG@5:0.5330) [0.9 s] *
+INFO:root:Epoch 3     loss=0.2850 [359.0 s]	dev=(HR@5:0.7364,NDCG@5:0.5771) [0.9 s] *
+INFO:root:Epoch 4     loss=0.2699 [359.1 s]	dev=(HR@5:0.7530,NDCG@5:0.5988) [0.9 s] *
+INFO:root:Epoch 5     loss=0.2611 [355.5 s]	dev=(HR@5:0.7596,NDCG@5:0.6087) [1.0 s] *
+INFO:root:Epoch 6     loss=0.2554 [352.6 s]	dev=(HR@5:0.7657,NDCG@5:0.6172) [0.9 s] *
+INFO:root:Early stop manually
+INFO:root:Namespace(model_name='fuxi', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-29 16:44:56 ---------------------------------------------
+INFO:root:
+=======================================
+ Arguments              | Values       
+=======================================
+ batch_size             | 128         
+ data_appendix          |             
+ dataset                | MovieLens_1M
+ dropout                | 0.2         
+ early_stop             | 101         
+ emb_size               | 50          
+ epoch                  | 101         
+ eval_batch_size        | 128         
+ fuxi_attention_dim     | 50          
+ fuxi_attn_dropout      | 0.2         
+ fuxi_blocks            | 2           
+ fuxi_enable_rel_bias   | 1           
+ fuxi_ffn_multiply      | 1.0         
+ fuxi_ffn_single_stage  | 0           
+ fuxi_heads             | 1           
+ fuxi_linear_activation | silu        
+ fuxi_linear_dim        | 50          
+ fuxi_linear_dropout    | 0.2         
+ gpu                    | 0           
+ history_max            | 200         
+ l2                     | 0.0         
+ lr                     | 0.001       
+ main_metric            |             
+ num_neg                | 128         
+ num_workers            | 5           
+ optimizer              | Adam        
+ random_seed            | 0           
+ save_final_results     | 0           
+ test_all               | 0           
+ topk                   | 5,10,20,50  
+=======================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/MovieLens_1M/SeqReader.pkl
+INFO:root:#params: 268910
+INFO:root:FuXi(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(3954, 50, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(201, 50)
+    (_emb_dropout): Dropout(p=0.2, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): FuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(3954, 50, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(201, 50)
+      (_emb_dropout): Dropout(p=0.2, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-1): 2 x FuXiBlockJagged(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=150, out_features=50, bias=True)
+            (lin1): Linear(in_features=50, out_features=50, bias=False)
+            (lin2): Linear(in_features=50, out_features=50, bias=False)
+            (lin3): Linear(in_features=50, out_features=50, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0427,NDCG@5:0.0253,HR@10:0.0944,NDCG@10:0.0419,HR@20:0.1930,NDCG@20:0.0664,HR@50:0.4997,NDCG@50:0.1263)
+INFO:root:Optimizer: Adam
+INFO:root:Early stop manually
+INFO:root:Namespace(model_name='fuxi', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-29 16:45:46 ---------------------------------------------
+INFO:root:
+=======================================
+ Arguments              | Values       
+=======================================
+ batch_size             | 128         
+ data_appendix          |             
+ dataset                | MovieLens_1M
+ dropout                | 0.2         
+ early_stop             | 0           
+ emb_size               | 50          
+ epoch                  | 101         
+ eval_batch_size        | 128         
+ fuxi_attention_dim     | 50          
+ fuxi_attn_dropout      | 0.2         
+ fuxi_blocks            | 2           
+ fuxi_enable_rel_bias   | 1           
+ fuxi_ffn_multiply      | 1.0         
+ fuxi_ffn_single_stage  | 0           
+ fuxi_heads             | 1           
+ fuxi_linear_activation | silu        
+ fuxi_linear_dim        | 50          
+ fuxi_linear_dropout    | 0.2         
+ gpu                    | 0           
+ history_max            | 200         
+ l2                     | 0.0         
+ lr                     | 0.001       
+ main_metric            |             
+ num_neg                | 128         
+ num_workers            | 5           
+ optimizer              | Adam        
+ random_seed            | 0           
+ save_final_results     | 0           
+ test_all               | 0           
+ topk                   | 5,10,20,50  
+=======================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/MovieLens_1M/SeqReader.pkl
+INFO:root:#params: 268910
+INFO:root:FuXi(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(3954, 50, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(201, 50)
+    (_emb_dropout): Dropout(p=0.2, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): FuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(3954, 50, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(201, 50)
+      (_emb_dropout): Dropout(p=0.2, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-1): 2 x FuXiBlockJagged(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=150, out_features=50, bias=True)
+            (lin1): Linear(in_features=50, out_features=50, bias=False)
+            (lin2): Linear(in_features=50, out_features=50, bias=False)
+            (lin3): Linear(in_features=50, out_features=50, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0427,NDCG@5:0.0253,HR@10:0.0944,NDCG@10:0.0419,HR@20:0.1930,NDCG@20:0.0664,HR@50:0.4997,NDCG@50:0.1263)
+INFO:root:Optimizer: Adam
+INFO:root:Early stop manually

@@ -843,8 +843,8 @@ class FuXi(SequentialModel):
             default=240,
             help="Item embedding / FuXi hidden size.",
         )
-        parser.add_argument("--fuxi_blocks", type=int, default=2, help="# of FuXi blocks.")
-        parser.add_argument("--fuxi_heads", type=int, default=4, help="# of attention heads.")
+        parser.add_argument("--fuxi_blocks", type=int, default=2, help="FuXi blocks.")
+        parser.add_argument("--fuxi_heads", type=int, default=4, help="Attention heads.")
         parser.add_argument("--fuxi_linear_dim", type=int, default=64, help="Hidden dim in linear projections.")
         parser.add_argument("--fuxi_attention_dim", type=int, default=64, help="Attention q/k dim per head.")
         parser.add_argument("--fuxi_linear_dropout", type=float, default=0.1, help="Linear dropout rate.")

@@ -1,0 +1,75 @@
+INFO:root:Namespace(model_name='fuxi', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-11-30 18:34:55 ---------------------------------------------
+INFO:root:
+===============================================
+ Arguments              | Values               
+===============================================
+ batch_size             | 128                 
+ data_appendix          |                     
+ dataset                | Grocery_and_Gourm...
+ dropout                | 0.2                 
+ early_stop             | 0                   
+ emb_size               | 50                  
+ epoch                  | 101                 
+ eval_batch_size        | 128                 
+ fuxi_attention_dim     | 25                  
+ fuxi_attn_dropout      | 0.2                 
+ fuxi_blocks            | 8                   
+ fuxi_enable_rel_bias   | 1                   
+ fuxi_ffn_multiply      | 1.0                 
+ fuxi_ffn_single_stage  | 0                   
+ fuxi_heads             | 2                   
+ fuxi_linear_activation | silu                
+ fuxi_linear_dim        | 25                  
+ fuxi_linear_dropout    | 0.2                 
+ gpu                    | 0                   
+ history_max            | 200                 
+ l2                     | 0.0                 
+ lr                     | 0.001               
+ main_metric            |                     
+ num_neg                | 128                 
+ num_workers            | 5                   
+ optimizer              | Adam                
+ random_seed            | 0                   
+ save_final_results     | 0                   
+ test_all               | 0                   
+ topk                   | 5,10,20,50          
+===============================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/Grocery_and_Gourmet_Food/SeqReader.pkl
+INFO:root:#params: 690440
+INFO:root:FuXi(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(8715, 50, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(201, 50)
+    (_emb_dropout): Dropout(p=0.2, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): FuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(8715, 50, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(201, 50)
+      (_emb_dropout): Dropout(p=0.2, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-7): 8 x FuXiBlockJagged(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=150, out_features=50, bias=True)
+            (lin1): Linear(in_features=50, out_features=50, bias=False)
+            (lin2): Linear(in_features=50, out_features=50, bias=False)
+            (lin3): Linear(in_features=50, out_features=50, bias=False)
+          )
+        )
+      )
+    )
+  )
+)

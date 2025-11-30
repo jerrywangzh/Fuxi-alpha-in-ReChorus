@@ -1,11 +1,14 @@
+
+fuxi 训练参数 （ipynb格式） 
+
 COMMON_ML1M_L200 = (
     "--dataset MovieLens_1M --path data "    
     "--history_max 200 "
     "--gpu 0 "
     "--lr 1e-3 --l2 0 "
-    "--epoch 101 --early_stop 0 "                     # early_stop ，rechorus 里 runner 的专有参数，默认设置是 10 ，这里设置成 0 ，相当于不提前结束
+    "--epoch 101 --early_stop 0    # early_stop ，rechorus 里 runner 的专有参数，默认设置是 10 ，这里设置成 0 ，相当于不提前结束
     "--batch_size 128 --eval_batch_size 128 "
-    "--num_neg 128 "                                   # SampledSoftmax 的负样本数
+    "--num_neg 128 "                                   # SampledSoftmax的负样本数
     "--dropout 0.2 "                                   # 对应 train_fn.dropout_rate
     "--metric NDCG,HR --topk 5,10,20,50 "
     "--emb_size 50 "                                   # item_embedding_dim
@@ -23,4 +26,34 @@ COMMON_ML1M_L200 = (
   --fuxi_heads 1 \
   --fuxi_attention_dim 50 \
   --fuxi_linear_dim 50 \
+  --save_final_results 0
+
+
+fuxi-large 训练参数 （ipynb格式） 
+
+COMMON_ML1M_L200 = (
+    "--dataset MovieLens_1M --path data "
+    "--history_max 200 "
+    "--gpu 0 "
+    "--lr 1e-3 --l2 0 "
+    "--epoch 101 --early_stop 0 " 
+    "--batch_size 128 --eval_batch_size 128 "
+    "--num_neg 128 "              
+    "--dropout 0.2 "               
+    "--metric NDCG,HR --topk 5,10,20,50 "
+    "--emb_size 50 "               
+    "--fuxi_linear_activation silu "
+    "--fuxi_linear_dropout 0.2 --fuxi_attn_dropout 0.2 "
+    "--fuxi_ffn_multiply 1.0 --fuxi_ffn_single_stage 0 "
+    "--fuxi_enable_rel_bias 1 "
+)
+
+!python src/main.py $COMMON_ML1M_L200 \
+  --model_name fuxi \
+  --model_path {model_path} \
+  --log_file {log_file} \
+  --fuxi_blocks 8 \
+  --fuxi_heads 2 \
+  --fuxi_attention_dim 25 \
+  --fuxi_linear_dim 25 \
   --save_final_results 0

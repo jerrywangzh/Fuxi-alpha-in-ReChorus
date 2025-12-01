@@ -204,3 +204,88 @@ INFO:root:Load model from /mnt/e/collegeitem/third1/machinelearning/Fuxi-alpha-i
 INFO:root:Optimizer: Adam
 INFO:root:Epoch 1     loss=0.2197 [806.4 s]	dev=(HR@5:0.8012,NDCG@5:0.6593) [1.7 s] *
 INFO:root:Early stop manually
+INFO:root:Namespace(model_name='fuxi_upgrade', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-12-01 12:32:43 ---------------------------------------------
+INFO:root:
+=======================================
+ Arguments              | Values       
+=======================================
+ batch_size             | 128         
+ data_appendix          |             
+ dataset                | MovieLens_1M
+ dropout                | 0.2         
+ early_stop             | 0           
+ emb_size               | 50          
+ epoch                  | 50          
+ eval_batch_size        | 128         
+ fuxi_attention_dim     | 25          
+ fuxi_attn_dropout      | 0.2         
+ fuxi_blocks            | 8           
+ fuxi_enable_rel_bias   | 1           
+ fuxi_ffn_multiply      | 1.0         
+ fuxi_ffn_single_stage  | 0           
+ fuxi_heads             | 2           
+ fuxi_linear_activation | silu        
+ fuxi_linear_dim        | 25          
+ fuxi_linear_dropout    | 0.2         
+ gpu                    | 0           
+ history_max            | 200         
+ l2                     | 0.0         
+ lr                     | 0.001       
+ main_metric            |             
+ num_neg                | 128         
+ num_workers            | 5           
+ optimizer              | Adam        
+ random_seed            | 0           
+ save_final_results     | 0           
+ test_all               | 0           
+ topk                   | 5,10,20,50  
+=======================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/MovieLens_1M/SeqReader.pkl
+INFO:root:#params: 372390
+INFO:root:FuXiUpgrade(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(3954, 50, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(201, 50)
+    (_emb_dropout): Dropout(p=0.2, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): SemanticFreeFuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(3954, 50, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(201, 50)
+      (_emb_dropout): Dropout(p=0.2, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-7): 8 x SemanticFreeFuXiBlock(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=100, out_features=50, bias=True)
+            (lin1): Linear(in_features=50, out_features=50, bias=False)
+            (lin2): Linear(in_features=50, out_features=50, bias=False)
+            (lin3): Linear(in_features=50, out_features=50, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0487,NDCG@5:0.0286,HR@10:0.0957,NDCG@10:0.0436,HR@20:0.1960,NDCG@20:0.0686,HR@50:0.5005,NDCG@50:0.1281)
+INFO:root:Load model from /mnt/e/collegeitem/third1/machinelearning/Fuxi-alpha-in-ReChorus/models_saved/fuxi_upgrade_movielens_1M_large.pt
+INFO:root:Optimizer: Adam
+INFO:root:Epoch 1     loss=0.2172 [806.6 s]	dev=(HR@5:0.7997,NDCG@5:0.6582) [1.7 s] *
+INFO:root:Epoch 2     loss=0.2201 [809.6 s]	dev=(HR@5:0.8030,NDCG@5:0.6604) [1.9 s] *
+INFO:root:Epoch 3     loss=0.2197 [825.2 s]	dev=(HR@5:0.8033,NDCG@5:0.6618) [1.7 s] *
+INFO:root:Epoch 4     loss=0.2195 [828.1 s]	dev=(HR@5:0.8013,NDCG@5:0.6604) [1.8 s]
+INFO:root:Epoch 5     loss=0.2192 [815.5 s]	dev=(HR@5:0.7990,NDCG@5:0.6579) [1.7 s]
+INFO:root:Epoch 6     loss=0.2191 [829.3 s]	dev=(HR@5:0.8030,NDCG@5:0.6620) [1.9 s] *
+INFO:root:Epoch 7     loss=0.2190 [855.5 s]	dev=(HR@5:0.8015,NDCG@5:0.6605) [10.3 s]

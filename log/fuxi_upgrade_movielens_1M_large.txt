@@ -1,0 +1,206 @@
+INFO:root:Namespace(model_name='fuxi_upgrade', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-12-01 00:51:59 ---------------------------------------------
+INFO:root:
+=======================================
+ Arguments              | Values       
+=======================================
+ batch_size             | 128         
+ data_appendix          |             
+ dataset                | MovieLens_1M
+ dropout                | 0.2         
+ early_stop             | 0           
+ emb_size               | 50          
+ epoch                  | 101         
+ eval_batch_size        | 128         
+ fuxi_attention_dim     | 25          
+ fuxi_attn_dropout      | 0.2         
+ fuxi_blocks            | 8           
+ fuxi_enable_rel_bias   | 1           
+ fuxi_ffn_multiply      | 1.0         
+ fuxi_ffn_single_stage  | 0           
+ fuxi_heads             | 2           
+ fuxi_linear_activation | silu        
+ fuxi_linear_dim        | 25          
+ fuxi_linear_dropout    | 0.2         
+ gpu                    | 0           
+ history_max            | 200         
+ l2                     | 0.0         
+ lr                     | 0.001       
+ main_metric            |             
+ num_neg                | 128         
+ num_workers            | 5           
+ optimizer              | Adam        
+ random_seed            | 0           
+ save_final_results     | 0           
+ test_all               | 0           
+ topk                   | 5,10,20,50  
+=======================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/MovieLens_1M/SeqReader.pkl
+INFO:root:#params: 372390
+INFO:root:FuXiUpgrade(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(3954, 50, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(201, 50)
+    (_emb_dropout): Dropout(p=0.2, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): SemanticFreeFuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(3954, 50, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(201, 50)
+      (_emb_dropout): Dropout(p=0.2, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-7): 8 x SemanticFreeFuXiBlock(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=100, out_features=50, bias=True)
+            (lin1): Linear(in_features=50, out_features=50, bias=False)
+            (lin2): Linear(in_features=50, out_features=50, bias=False)
+            (lin3): Linear(in_features=50, out_features=50, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0487,NDCG@5:0.0286,HR@10:0.0957,NDCG@10:0.0436,HR@20:0.1960,NDCG@20:0.0686,HR@50:0.5005,NDCG@50:0.1281)
+INFO:root:Optimizer: Adam
+INFO:root:Epoch 1     loss=0.4284 [809.1 s]	dev=(HR@5:0.6058,NDCG@5:0.4472) [4.8 s] *
+INFO:root:Epoch 2     loss=0.3103 [806.9 s]	dev=(HR@5:0.7199,NDCG@5:0.5560) [1.7 s] *
+INFO:root:Epoch 3     loss=0.2733 [809.2 s]	dev=(HR@5:0.7474,NDCG@5:0.5921) [1.6 s] *
+INFO:root:Epoch 4     loss=0.2577 [809.3 s]	dev=(HR@5:0.7629,NDCG@5:0.6119) [1.7 s] *
+INFO:root:Epoch 5     loss=0.2487 [807.6 s]	dev=(HR@5:0.7750,NDCG@5:0.6242) [1.8 s] *
+INFO:root:Epoch 6     loss=0.2431 [813.3 s]	dev=(HR@5:0.7813,NDCG@5:0.6342) [1.7 s] *
+INFO:root:Epoch 7     loss=0.2392 [808.0 s]	dev=(HR@5:0.7849,NDCG@5:0.6384) [1.8 s] *
+INFO:root:Epoch 8     loss=0.2363 [808.5 s]	dev=(HR@5:0.7858,NDCG@5:0.6428) [5.0 s] *
+INFO:root:Epoch 9     loss=0.2342 [809.5 s]	dev=(HR@5:0.7892,NDCG@5:0.6473) [1.7 s] *
+INFO:root:Epoch 10    loss=0.2325 [807.9 s]	dev=(HR@5:0.7894,NDCG@5:0.6464) [1.7 s]
+INFO:root:Epoch 11    loss=0.2311 [807.7 s]	dev=(HR@5:0.7925,NDCG@5:0.6499) [1.7 s] *
+INFO:root:Epoch 12    loss=0.2300 [806.3 s]	dev=(HR@5:0.7892,NDCG@5:0.6494) [5.0 s]
+INFO:root:Epoch 13    loss=0.2289 [806.3 s]	dev=(HR@5:0.7944,NDCG@5:0.6522) [1.7 s] *
+INFO:root:Epoch 14    loss=0.2282 [809.6 s]	dev=(HR@5:0.7947,NDCG@5:0.6545) [1.7 s] *
+INFO:root:Epoch 15    loss=0.2275 [807.6 s]	dev=(HR@5:0.7959,NDCG@5:0.6530) [4.5 s]
+INFO:root:Epoch 16    loss=0.2268 [805.1 s]	dev=(HR@5:0.7977,NDCG@5:0.6574) [1.8 s] *
+INFO:root:Epoch 17    loss=0.2262 [807.3 s]	dev=(HR@5:0.7964,NDCG@5:0.6579) [1.7 s] *
+INFO:root:Epoch 18    loss=0.2257 [811.6 s]	dev=(HR@5:0.7955,NDCG@5:0.6555) [1.7 s]
+INFO:root:Epoch 19    loss=0.2254 [807.2 s]	dev=(HR@5:0.8003,NDCG@5:0.6567) [1.6 s]
+INFO:root:Epoch 20    loss=0.2251 [809.7 s]	dev=(HR@5:0.8010,NDCG@5:0.6584) [1.7 s] *
+INFO:root:Epoch 21    loss=0.2246 [806.2 s]	dev=(HR@5:0.7987,NDCG@5:0.6562) [1.7 s]
+INFO:root:Epoch 22    loss=0.2241 [810.4 s]	dev=(HR@5:0.7969,NDCG@5:0.6573) [1.7 s]
+INFO:root:Epoch 23    loss=0.2239 [816.8 s]	dev=(HR@5:0.7977,NDCG@5:0.6566) [1.8 s]
+INFO:root:Epoch 24    loss=0.2236 [810.0 s]	dev=(HR@5:0.8038,NDCG@5:0.6611) [1.7 s] *
+INFO:root:Epoch 25    loss=0.2233 [805.0 s]	dev=(HR@5:0.7985,NDCG@5:0.6591) [1.7 s]
+INFO:root:Epoch 26    loss=0.2230 [810.0 s]	dev=(HR@5:0.7998,NDCG@5:0.6606) [1.7 s]
+INFO:root:Epoch 27    loss=0.2229 [808.2 s]	dev=(HR@5:0.8013,NDCG@5:0.6608) [1.8 s]
+INFO:root:Epoch 28    loss=0.2226 [811.9 s]	dev=(HR@5:0.7962,NDCG@5:0.6584) [1.7 s]
+INFO:root:Epoch 29    loss=0.2222 [807.9 s]	dev=(HR@5:0.8007,NDCG@5:0.6592) [1.7 s]
+INFO:root:Epoch 30    loss=0.2221 [807.3 s]	dev=(HR@5:0.8000,NDCG@5:0.6575) [1.7 s]
+INFO:root:Epoch 31    loss=0.2220 [803.0 s]	dev=(HR@5:0.8003,NDCG@5:0.6595) [1.8 s]
+INFO:root:Epoch 32    loss=0.2218 [809.8 s]	dev=(HR@5:0.7992,NDCG@5:0.6596) [1.7 s]
+INFO:root:Epoch 33    loss=0.2215 [804.0 s]	dev=(HR@5:0.7998,NDCG@5:0.6606) [1.7 s]
+INFO:root:Epoch 34    loss=0.2214 [804.7 s]	dev=(HR@5:0.8000,NDCG@5:0.6593) [1.8 s]
+INFO:root:Epoch 35    loss=0.2213 [803.0 s]	dev=(HR@5:0.7977,NDCG@5:0.6567) [1.7 s]
+INFO:root:Epoch 36    loss=0.2210 [813.8 s]	dev=(HR@5:0.8013,NDCG@5:0.6597) [1.7 s]
+INFO:root:Epoch 37    loss=0.2208 [817.7 s]	dev=(HR@5:0.8023,NDCG@5:0.6601) [1.7 s]
+INFO:root:Epoch 38    loss=0.2208 [818.3 s]	dev=(HR@5:0.8026,NDCG@5:0.6601) [1.8 s]
+INFO:root:Epoch 39    loss=0.2207 [822.1 s]	dev=(HR@5:0.8045,NDCG@5:0.6604) [1.7 s]
+INFO:root:Epoch 40    loss=0.2206 [819.4 s]	dev=(HR@5:0.8028,NDCG@5:0.6615) [1.7 s] *
+INFO:root:Epoch 41    loss=0.2203 [823.4 s]	dev=(HR@5:0.7993,NDCG@5:0.6578) [1.7 s]
+INFO:root:Epoch 42    loss=0.2203 [819.6 s]	dev=(HR@5:0.7957,NDCG@5:0.6559) [1.7 s]
+INFO:root:Epoch 43    loss=0.2201 [809.5 s]	dev=(HR@5:0.7992,NDCG@5:0.6594) [1.7 s]
+INFO:root:Epoch 44    loss=0.2200 [815.9 s]	dev=(HR@5:0.8031,NDCG@5:0.6605) [1.7 s]
+INFO:root:Epoch 45    loss=0.2198 [826.2 s]	dev=(HR@5:0.7997,NDCG@5:0.6597) [1.7 s]
+INFO:root:Epoch 46    loss=0.2196 [820.6 s]	dev=(HR@5:0.8036,NDCG@5:0.6636) [1.7 s] *
+INFO:root:Epoch 47    loss=0.2195 [817.7 s]	dev=(HR@5:0.8003,NDCG@5:0.6590) [1.7 s]
+INFO:root:Epoch 48    loss=0.2195 [812.9 s]	dev=(HR@5:0.8012,NDCG@5:0.6599) [1.7 s]
+INFO:root:Epoch 49    loss=0.2195 [827.5 s]	dev=(HR@5:0.8017,NDCG@5:0.6600) [1.7 s]
+INFO:root:Namespace(model_name='fuxi_upgrade', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-12-01 12:17:30 ---------------------------------------------
+INFO:root:
+=======================================
+ Arguments              | Values       
+=======================================
+ batch_size             | 128         
+ data_appendix          |             
+ dataset                | MovieLens_1M
+ dropout                | 0.2         
+ early_stop             | 0           
+ emb_size               | 50          
+ epoch                  | 101         
+ eval_batch_size        | 128         
+ fuxi_attention_dim     | 25          
+ fuxi_attn_dropout      | 0.2         
+ fuxi_blocks            | 8           
+ fuxi_enable_rel_bias   | 1           
+ fuxi_ffn_multiply      | 1.0         
+ fuxi_ffn_single_stage  | 0           
+ fuxi_heads             | 2           
+ fuxi_linear_activation | silu        
+ fuxi_linear_dim        | 25          
+ fuxi_linear_dropout    | 0.2         
+ gpu                    | 0           
+ history_max            | 200         
+ l2                     | 0.0         
+ lr                     | 0.001       
+ main_metric            |             
+ num_neg                | 128         
+ num_workers            | 5           
+ optimizer              | Adam        
+ random_seed            | 0           
+ save_final_results     | 0           
+ test_all               | 0           
+ topk                   | 5,10,20,50  
+=======================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/MovieLens_1M/SeqReader.pkl
+INFO:root:#params: 372390
+INFO:root:FuXiUpgrade(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(3954, 50, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(201, 50)
+    (_emb_dropout): Dropout(p=0.2, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): SemanticFreeFuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(3954, 50, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(201, 50)
+      (_emb_dropout): Dropout(p=0.2, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-7): 8 x SemanticFreeFuXiBlock(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=100, out_features=50, bias=True)
+            (lin1): Linear(in_features=50, out_features=50, bias=False)
+            (lin2): Linear(in_features=50, out_features=50, bias=False)
+            (lin3): Linear(in_features=50, out_features=50, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0487,NDCG@5:0.0286,HR@10:0.0957,NDCG@10:0.0436,HR@20:0.1960,NDCG@20:0.0686,HR@50:0.5005,NDCG@50:0.1281)
+INFO:root:Load model from /mnt/e/collegeitem/third1/machinelearning/Fuxi-alpha-in-ReChorus/models_saved/fuxi_upgrade_movielens_1M_large.pt
+INFO:root:Optimizer: Adam
+INFO:root:Epoch 1     loss=0.2197 [806.4 s]	dev=(HR@5:0.8012,NDCG@5:0.6593) [1.7 s] *
+INFO:root:Early stop manually

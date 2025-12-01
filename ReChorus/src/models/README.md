@@ -41,11 +41,12 @@
 
 ---
 
-Fuxi 的时间复杂度主要集中在 AMS ,尤其是 语义块 的计算中，其中涉及多次矩阵乘法。对于语义块，一个 batch 会耗时 o(B * N * N * H * D_attn) + o(B * N * N * H * D_lin) ~ o(2 * B * N^2 * H * max{D_attn,D_lin}) 。
+## 下面解释 AMS 和 MFFN 时，会交替用 `(B, N, ·)`（dense）与 `(sum_i N_i, ·)` 也可写作 `(sumN, ·)` （jagged）两种视角。
 
-因此 Fuxi 使用 fbgemm_gpu 高效算子进行运算。会将序列规定长度 N 在计算中换成实际长度 N_i ，稀疏化计算 + 自带功能优化 使得复杂时间任务能高效完成。这也是 Fuxi 堆叠 fuxiblock 形成深层网络 和 训练工业数据集（亿级点击量）的基础
+* Fuxi 的时间复杂度主要集中在 AMS ,尤其是 语义块 的计算中，涉及多次矩阵乘法。对于语义块，一个 batch 会耗时 o(B * N * N * H * D_attn) + o(B * N * N * H * D_lin) ~ o(2 * B * N^2 * H * max{D_attn,D_lin}) 。
 
-# 下面解释 AMS 和 MFFN 时，会交替用 `(B, N, ·)`（dense）与 `(sum_i N_i, ·)` 也可写作 `(sumN, ·)` （jagged）两种视角。
+* 因此 Fuxi 使用 fbgemm_gpu 高效算子进行运算。会将序列规定长度 N 在计算中换成实际长度 N_i ，稀疏化计算 + 自带功能优化 使得耗时任务能高效完成。这也是 Fuxi 堆叠 fuxiblock 形成深层网络和训练 工业数据集（亿级点击量） 的基础
+
 
 ---
 

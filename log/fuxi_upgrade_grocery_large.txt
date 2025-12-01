@@ -1,0 +1,96 @@
+INFO:root:Namespace(model_name='fuxi_upgrade', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-12-01 00:18:15 ---------------------------------------------
+INFO:root:
+===============================================
+ Arguments              | Values               
+===============================================
+ batch_size             | 128                 
+ data_appendix          |                     
+ dataset                | Grocery_and_Gourm...
+ dropout                | 0.2                 
+ early_stop             | 0                   
+ emb_size               | 50                  
+ epoch                  | 101                 
+ eval_batch_size        | 128                 
+ fuxi_attention_dim     | 25                  
+ fuxi_attn_dropout      | 0.2                 
+ fuxi_blocks            | 8                   
+ fuxi_enable_rel_bias   | 1                   
+ fuxi_ffn_multiply      | 1.0                 
+ fuxi_ffn_single_stage  | 0                   
+ fuxi_heads             | 2                   
+ fuxi_linear_activation | silu                
+ fuxi_linear_dim        | 25                  
+ fuxi_linear_dropout    | 0.2                 
+ gpu                    | 0                   
+ history_max            | 200                 
+ l2                     | 0.0                 
+ lr                     | 0.001               
+ main_metric            |                     
+ num_neg                | 128                 
+ num_workers            | 5                   
+ optimizer              | Adam                
+ random_seed            | 0                   
+ save_final_results     | 0                   
+ test_all               | 0                   
+ topk                   | 5,10,20,50          
+===============================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/Grocery_and_Gourmet_Food/SeqReader.pkl
+INFO:root:#params: 610440
+INFO:root:FuXiUpgrade(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(8715, 50, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(201, 50)
+    (_emb_dropout): Dropout(p=0.2, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): SemanticFreeFuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(8715, 50, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(201, 50)
+      (_emb_dropout): Dropout(p=0.2, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-7): 8 x SemanticFreeFuXiBlock(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=100, out_features=50, bias=True)
+            (lin1): Linear(in_features=50, out_features=50, bias=False)
+            (lin2): Linear(in_features=50, out_features=50, bias=False)
+            (lin3): Linear(in_features=50, out_features=50, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0507,NDCG@5:0.0295,HR@10:0.1036,NDCG@10:0.0464,HR@20:0.2071,NDCG@20:0.0722,HR@50:0.5053,NDCG@50:0.1303)
+INFO:root:Optimizer: Adam
+INFO:root:Epoch 1     loss=0.5996 [100.3 s]	dev=(HR@5:0.2838,NDCG@5:0.1885) [3.5 s] *
+INFO:root:Epoch 2     loss=0.5171 [102.4 s]	dev=(HR@5:0.3464,NDCG@5:0.2367) [3.8 s] *
+INFO:root:Epoch 3     loss=0.4884 [102.4 s]	dev=(HR@5:0.3723,NDCG@5:0.2559) [3.7 s] *
+INFO:root:Epoch 4     loss=0.4684 [102.9 s]	dev=(HR@5:0.3906,NDCG@5:0.2739) [4.0 s] *
+INFO:root:Epoch 5     loss=0.4499 [103.5 s]	dev=(HR@5:0.4079,NDCG@5:0.2924) [3.7 s] *
+INFO:root:Epoch 6     loss=0.4314 [103.6 s]	dev=(HR@5:0.4195,NDCG@5:0.3083) [3.7 s] *
+INFO:root:Epoch 7     loss=0.4152 [102.6 s]	dev=(HR@5:0.4312,NDCG@5:0.3210) [3.5 s] *
+INFO:root:Epoch 8     loss=0.4012 [102.6 s]	dev=(HR@5:0.4358,NDCG@5:0.3290) [3.6 s] *
+INFO:root:Epoch 9     loss=0.3894 [102.7 s]	dev=(HR@5:0.4452,NDCG@5:0.3386) [3.7 s] *
+INFO:root:Epoch 10    loss=0.3790 [102.7 s]	dev=(HR@5:0.4481,NDCG@5:0.3423) [3.8 s] *
+INFO:root:Epoch 11    loss=0.3701 [103.3 s]	dev=(HR@5:0.4507,NDCG@5:0.3469) [3.8 s] *
+INFO:root:Epoch 12    loss=0.3618 [102.7 s]	dev=(HR@5:0.4528,NDCG@5:0.3491) [4.1 s] *
+INFO:root:Epoch 13    loss=0.3546 [101.1 s]	dev=(HR@5:0.4486,NDCG@5:0.3457) [3.7 s]
+INFO:root:Epoch 14    loss=0.3481 [103.5 s]	dev=(HR@5:0.4516,NDCG@5:0.3493) [3.8 s] *
+INFO:root:Epoch 15    loss=0.3423 [102.5 s]	dev=(HR@5:0.4543,NDCG@5:0.3522) [3.6 s] *
+INFO:root:Epoch 16    loss=0.3363 [103.4 s]	dev=(HR@5:0.4524,NDCG@5:0.3530) [3.8 s] *
+INFO:root:Epoch 17    loss=0.3309 [104.6 s]	dev=(HR@5:0.4540,NDCG@5:0.3533) [3.7 s] *
+INFO:root:Epoch 18    loss=0.3257 [105.1 s]	dev=(HR@5:0.4576,NDCG@5:0.3564) [3.8 s] *
+INFO:root:Early stop manually

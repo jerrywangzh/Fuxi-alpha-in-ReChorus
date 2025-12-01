@@ -19,7 +19,7 @@ from utils import utils
 
 import numpy as np
 
-# 兼容 NumPy 2.x：补回 np.int 等老别名，避免第三方库报 AttributeError
+# 兼容 NumPy 2.x：补回 np.int 等老别名
 if not hasattr(np, "int"):
     np.int = int
 if not hasattr(np, "bool"):
@@ -51,23 +51,19 @@ def parse_global_args(parser):
 
 
 def main():
-	# 由 argparse 解析的所有参数都汇总在全局 args 中，以下注释标注它们的来源和用途
 	logging.info('-' * 45 + ' BEGIN: ' + utils.get_time() + ' ' + '-' * 45)
 	exclude = ['check_epoch', 'log_file', 'model_path', 'path', 'pin_memory', 'load',
 			   'regenerate', 'sep', 'train', 'verbose', 'metric', 'test_epoch', 'buffer']
 	logging.info(utils.format_arg_str(args, exclude_lst=exclude))
 
-	# Random seed（来自 parse_global_args）
 	utils.init_seed(args.random_seed)
 
-	# GPU（parse_global_args 中的 --gpu）
 	os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 	args.device = torch.device('cpu')
 	if args.gpu != '' and torch.cuda.is_available():
 		args.device = torch.device('cuda')
 	logging.info('Device: {}'.format(args.device))
 
-	# Read data（reader_name.parse_data_args 提供 path/dataset/regenerate 等）
 	corpus_path = os.path.join(args.path, args.dataset, model_name.reader+args.data_appendix+ '.pkl')
 	if not args.regenerate and os.path.exists(corpus_path):
 		logging.info('Load corpus from {}'.format(corpus_path))
@@ -77,31 +73,27 @@ def main():
 		logging.info('Save corpus to {}'.format(corpus_path))
 		pickle.dump(corpus, open(corpus_path, 'wb'))
 
-	# Define model（model_name.parse_model_args 的参数在此生效）
 	model = model_name(args, corpus).to(args.device)
 	logging.info('#params: {}'.format(model.count_variables()))
 	logging.info(model)
 
-	# Define dataset（Dataset 内使用 history_max/num_neg 等 reader 参数）
 	data_dict = dict()
 	for phase in ['train', 'dev', 'test']:
 		data_dict[phase] = model_name.Dataset(model, corpus, phase)
 		data_dict[phase].prepare()
 
-	# Run model（runner_name.parse_runner_args 里的 epoch/lr/batch_size 等在 runner 内读取）
 	runner = runner_name(args)
 	logging.info('Test Before Training: ' + runner.print_res(data_dict['test']))
-	if args.load > 0:  # parse_global_args 的 --load 决定是否恢复模型
+	if args.load > 0:  # --load 决定是否恢复模型
 		model.load_model()
 	if args.train > 0:  # --train 控制训练阶段开关
 		runner.train(data_dict)
 
-	# Evaluate final results
 	eval_res = runner.print_res(data_dict['dev'])
 	logging.info(os.linesep + 'Dev  After Training: ' + eval_res)
 	eval_res = runner.print_res(data_dict['test'])
 	logging.info(os.linesep + 'Test After Training: ' + eval_res)
-	if args.save_final_results==1: # parse_global_args 的 --save_final_results，控制是否保存预测文件
+	if args.save_final_results==1: # --save_final_results，控制是否保存预测文件
 		save_rec_results(data_dict['dev'], runner, 100)
 		save_rec_results(data_dict['test'], runner, 100)
 	model.actions_after_train()
@@ -113,7 +105,7 @@ def save_rec_results(dataset, runner, topk):
 	result_path = os.path.join(runner.log_path,runner.save_appendix, 'rec-{}-{}.csv'.format(model_name,dataset.phase))
 	utils.check_dir(result_path)
 
-	if init_args.model_mode == 'CTR': # CTR task 
+	if init_args.model_mode == 'CTR':
 		logging.info('Saving CTR prediction results to: {}'.format(result_path))
 		predictions, labels = runner.predict(dataset)
 		users, items= list(), list()
@@ -127,9 +119,9 @@ def save_rec_results(dataset, runner, topk):
 		rec_df['pCTR'] = predictions
 		rec_df['label'] = labels
 		rec_df.to_csv(result_path, sep=args.sep, index=False)
-	elif init_args.model_mode in ['TopK','']: # TopK Ranking task
+	elif init_args.model_mode in ['TopK','']: 
 		logging.info('Saving top-{} recommendation results to: {}'.format(topk, result_path))
-		predictions = runner.predict(dataset)  # n_users, n_candidates
+		predictions = runner.predict(dataset) 
 		users, rec_items, rec_predictions = list(), list(), list()
 		for i in range(len(dataset)):
 			info = dataset[i]
@@ -143,9 +135,9 @@ def save_rec_results(dataset, runner, topk):
 		rec_df['rec_items'] = rec_items
 		rec_df['rec_predictions'] = rec_predictions
 		rec_df.to_csv(result_path, sep=args.sep, index=False)
-	elif init_args.model_mode in ['Impression','General','Sequential']: # List-wise reranking task: Impression is reranking task for general/seq baseranker. General/Sequential is reranking task for rerankers with general/sequential input.
+	elif init_args.model_mode in ['Impression','General','Sequential']: 
 		logging.info('Saving all recommendation results to: {}'.format(result_path))
-		predictions = runner.predict(dataset)  # n_users, n_candidates
+		predictions = runner.predict(dataset)  
 		users, pos_items, pos_predictions, neg_items, neg_predictions= list(), list(), list(), list(), list()
 		for i in range(len(dataset)):
 			info = dataset[i]
@@ -175,23 +167,21 @@ if __name__ == '__main__':
 	init_args, init_extras = init_parser.parse_known_args()
 	
 	model_name = eval('{0}.{0}{1}'.format(init_args.model_name,init_args.model_mode))
-	reader_name = eval('{0}.{0}'.format(model_name.reader))  # model chooses the reader
-	runner_name = eval('{0}.{0}'.format(model_name.runner))  # model chooses the runner
+	reader_name = eval('{0}.{0}'.format(model_name.reader)) 
+	runner_name = eval('{0}.{0}'.format(model_name.runner)) 
 
-	# Args
 	parser = argparse.ArgumentParser(description='')
-	parser = parse_global_args(parser)  # 通用 CLI：--gpu/--random_seed/--log_file/--train 等
-	parser = reader_name.parse_data_args(parser)  # reader 专属 CLI：--dataset/--path/--history_max 等
-	parser = runner_name.parse_runner_args(parser)  # runner 专属 CLI：--epoch/--batch_size/--lr/--num_workers 等
-	parser = model_name.parse_model_args(parser)  # 模型专属 CLI：emb_size/层数/正则等
+	parser = parse_global_args(parser)  # --gpu/--random_seed/--log_file/--train 等
+	parser = reader_name.parse_data_args(parser)  # --dataset/--path/--history_max 等
+	parser = runner_name.parse_runner_args(parser)  # --epoch/--batch_size/--lr/--num_workers 等
+	parser = model_name.parse_model_args(parser)  # 模型专属：emb_size/层数/正则等
 	args, extras = parser.parse_known_args()
 	
-	args.data_appendix = '' # save different version of data for, e.g., context-aware readers with different groups of context
+	args.data_appendix = '' 
 	if 'Context' in model_name.reader:
 		args.data_appendix = '_context%d%d%d'%(args.include_item_features,args.include_user_features,
 										args.include_situation_features)
 
-	# Logging configuration
 	log_args = [init_args.model_name+init_args.model_mode, args.dataset+args.data_appendix, str(args.random_seed)]
 	for arg in ['lr', 'l2'] + model_name.extra_log_args:
 		log_args.append(arg + '=' + str(eval('args.' + arg)))

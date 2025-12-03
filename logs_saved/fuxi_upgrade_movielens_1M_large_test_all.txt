@@ -1,0 +1,159 @@
+INFO:root:Namespace(model_name='fuxi_upgrade', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-12-02 00:40:52 ---------------------------------------------
+INFO:root:
+=======================================
+ Arguments              | Values       
+=======================================
+ batch_size             | 128         
+ data_appendix          |             
+ dataset                | MovieLens_1M
+ dropout                | 0.2         
+ early_stop             | 0           
+ emb_size               | 50          
+ epoch                  | 101         
+ eval_batch_size        | 128         
+ fuxi_attention_dim     | 50          
+ fuxi_attn_dropout      | 0.2         
+ fuxi_blocks            | 2           
+ fuxi_enable_rel_bias   | 1           
+ fuxi_ffn_multiply      | 1.0         
+ fuxi_ffn_single_stage  | 0           
+ fuxi_heads             | 1           
+ fuxi_linear_activation | silu        
+ fuxi_linear_dim        | 50          
+ fuxi_linear_dropout    | 0.2         
+ gpu                    | 0           
+ history_max            | 200         
+ l2                     | 0.0         
+ lr                     | 0.001       
+ main_metric            |             
+ num_neg                | 128         
+ num_workers            | 5           
+ optimizer              | Adam        
+ random_seed            | 0           
+ save_final_results     | 0           
+ test_all               | 1           
+ topk                   | 5,10,20,50  
+=======================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/MovieLens_1M/SeqReader.pkl
+INFO:root:#params: 248910
+INFO:root:FuXiUpgrade(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(3954, 50, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(201, 50)
+    (_emb_dropout): Dropout(p=0.2, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): SemanticFreeFuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(3954, 50, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(201, 50)
+      (_emb_dropout): Dropout(p=0.2, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-1): 2 x SemanticFreeFuXiBlock(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=100, out_features=50, bias=True)
+            (lin1): Linear(in_features=50, out_features=50, bias=False)
+            (lin2): Linear(in_features=50, out_features=50, bias=False)
+            (lin3): Linear(in_features=50, out_features=50, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0005,NDCG@5:0.0003,HR@10:0.0015,NDCG@10:0.0007,HR@20:0.0043,NDCG@20:0.0014,HR@50:0.0123,NDCG@50:0.0029)
+INFO:root:Namespace(model_name='fuxi_upgrade', model_mode='')
+INFO:root:--------------------------------------------- BEGIN: 2025-12-02 00:43:13 ---------------------------------------------
+INFO:root:
+=======================================
+ Arguments              | Values       
+=======================================
+ batch_size             | 128         
+ data_appendix          |             
+ dataset                | MovieLens_1M
+ dropout                | 0.2         
+ early_stop             | 0           
+ emb_size               | 50          
+ epoch                  | 101         
+ eval_batch_size        | 128         
+ fuxi_attention_dim     | 25          
+ fuxi_attn_dropout      | 0.2         
+ fuxi_blocks            | 8           
+ fuxi_enable_rel_bias   | 1           
+ fuxi_ffn_multiply      | 1.0         
+ fuxi_ffn_single_stage  | 0           
+ fuxi_heads             | 2           
+ fuxi_linear_activation | silu        
+ fuxi_linear_dim        | 25          
+ fuxi_linear_dropout    | 0.2         
+ gpu                    | 0           
+ history_max            | 200         
+ l2                     | 0.0         
+ lr                     | 0.001       
+ main_metric            |             
+ num_neg                | 128         
+ num_workers            | 5           
+ optimizer              | Adam        
+ random_seed            | 0           
+ save_final_results     | 0           
+ test_all               | 1           
+ topk                   | 5,10,20,50  
+=======================================
+INFO:root:Device: cuda
+INFO:root:Load corpus from data/MovieLens_1M/SeqReader.pkl
+INFO:root:#params: 372390
+INFO:root:FuXiUpgrade(
+  (embedding_module): LocalEmbeddingModule(
+    (_item_emb): Embedding(3954, 50, padding_idx=0)
+  )
+  (interaction_module): DotProductSimilarity()
+  (input_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+    (_pos_emb): Embedding(201, 50)
+    (_emb_dropout): Dropout(p=0.2, inplace=False)
+  )
+  (output_postproc): L2NormEmbeddingPostprocessor()
+  (encoder): SemanticFreeFuXi(
+    (_ndp_module): DotProductSimilarity()
+    (_embedding_module): LocalEmbeddingModule(
+      (_item_emb): Embedding(3954, 50, padding_idx=0)
+    )
+    (_input_features_preproc): LearnablePositionalEmbeddingInputFeaturesPreprocessor(
+      (_pos_emb): Embedding(201, 50)
+      (_emb_dropout): Dropout(p=0.2, inplace=False)
+    )
+    (_output_postproc): L2NormEmbeddingPostprocessor()
+    (_fuxi): FuXiJagged(
+      (_attention_layers): ModuleList(
+        (0-7): 8 x SemanticFreeFuXiBlock(
+          (_rel_attn_bias): SeperatedRelativeBucketedTimeAndPositionBasedBias()
+          (_mffn): MultistageFeedforwardNeuralNetwork(
+            (lin0): Linear(in_features=100, out_features=50, bias=True)
+            (lin1): Linear(in_features=50, out_features=50, bias=False)
+            (lin2): Linear(in_features=50, out_features=50, bias=False)
+            (lin3): Linear(in_features=50, out_features=50, bias=False)
+          )
+        )
+      )
+    )
+  )
+)
+INFO:root:Test Before Training: (HR@5:0.0012,NDCG@5:0.0006,HR@10:0.0018,NDCG@10:0.0009,HR@20:0.0051,NDCG@20:0.0017,HR@50:0.0134,NDCG@50:0.0033)
+INFO:root:Load model from /mnt/e/collegeitem/third1/machinelearning/Fuxi-alpha-in-ReChorus/models_saved/fuxi_upgrade_movielens_1M_large.pt
+INFO:root:
+Dev  After Training: (HR@5:0.2568,NDCG@5:0.1746,HR@10:0.3652,NDCG@10:0.2095,HR@20:0.4841,NDCG@20:0.2395,HR@50:0.6488,NDCG@50:0.2725)
+INFO:root:
+Test After Training: (HR@5:0.2387,NDCG@5:0.1622,HR@10:0.3422,NDCG@10:0.1955,HR@20:0.4555,NDCG@20:0.2241,HR@50:0.6179,NDCG@50:0.2564)
+INFO:root:
+--------------------------------------------- END: 2025-12-02 00:43:24 ---------------------------------------------
